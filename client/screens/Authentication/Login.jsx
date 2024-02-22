@@ -1,12 +1,73 @@
-import { Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native'
-import React from 'react'
+import { Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, View } from 'react-native'
+import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { login } from '../../redux/authentication/authenticationSlice';
+import { validateError } from '../../util/validation/validateError';
+import LoadingIndicator from '../../util/Loading/LoadingIndicator';
+
+const re =
+  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 const Login = () => {
     const navigate = useNavigation()
+    const dispatch = useDispatch()
+    const {loading} = useSelector(store => store.authenticationSlice)
+
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+
+    const [error, setError] = useState({
+        email: '',
+        password: ''
+    })
+
+    const validation = () => {
+        let tempError = {
+            email: '',
+            password: ''
+        }
+        if(!email.toLocaleLowerCase().match(re)) tempError.email = validateError.failEmailVailidate
+        if(email.length === 0) tempError.email = validateError.notEnterEmail
+        
+        if(password.length === 0) tempError.password = validateError.notEnterPassword
+        setError(tempError)
+        if(tempError.email.length === 0 && tempError.password.length === 0)
+            return true
+        else return false
+    }
+
+    const handleLogin = async () => {
+        let validate = validation()
+        if(validate){
+            const loginData = {
+                email,
+                password
+            }
+            const res = await dispatch(login(loginData))
+            if(res.payload.status === 'ok'){
+                navigate.navigate("Root", {screen:"Home"})
+                ToastAndroid.show('Login success !', ToastAndroid.LONG);
+            }else {
+                ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
+            }
+        }
+    }
+
+    const handleInput = (type, text) => {
+        switch(type) {
+            case 'email':
+                setEmail(text)
+                break;
+            case 'password':
+                setPassword(text)
+                break;
+        }
+    }
   return (
     <SafeAreaView style={styles.container}>
+        <LoadingIndicator loading={loading}/>
         <View style={styles.logoContainer}>
             <Image source={require('./../../assets/logo.png')}/>
         </View>
@@ -16,22 +77,24 @@ const Login = () => {
             </View>
             <View style={styles.inputFieldContainer}>
                 <Text style={styles.inputLabel}>Email</Text>
-                <TextInput style={styles.input}/>
+                <TextInput style={styles.input} onChangeText={(text) => {handleInput('email',text)}}/>
                 <MaterialIcons name="email" size={24} color="#ccc" style={styles.icon}/>
+                <Text style={styles.errorText}>{error.email}</Text>
             </View>
             <View style={[styles.inputFieldContainer,{marginTop: 30}]}>
                 <Text style={styles.inputLabel}>Password</Text>
-                <TextInput secureTextEntry={true} style={styles.input}/>
-                <MaterialIcons name="vpn-key" size={24} color="#ccc" style={styles.icon}/>
+                <TextInput secureTextEntry={true} style={styles.input} onChangeText={(text) => {handleInput('password',text)}}/>
+                <MaterialIcons name="vpn-key" size={24} color="#ccc" style={styles.icon} />
+                <Text style={styles.errorText}>{error.password}</Text>
             </View>
             <View style={styles.buttonContainer}>
-                <Pressable style={[styles.button,styles.mainButton]}>
+                <Pressable style={[styles.button,styles.mainButton]} onPress={handleLogin}>
                     <Text style={styles.mainButtonText}>LOGIN</Text>
                 </Pressable>
                 <Pressable style={[styles.button,styles.secondButton,{marginTop: 15}]} onPress={() => navigate.navigate("Register")}>
                     <Text style={styles.secondButtonText}>REGISTER</Text>
                 </Pressable>
-                <Pressable style={styles.forgotPassContainer}>
+                <Pressable style={styles.forgotPassContainer} onPress={() => navigate.navigate("ForgotPassword")}>
                     <Text style={styles.forgotPassText}>Forgot password ?</Text>
                 </Pressable>
             </View>
@@ -74,11 +137,11 @@ const styles = StyleSheet.create({
         paddingVertical: 5,
         paddingLeft: 30,
         paddingRight: 10,
-        fontSize: 18
+        fontSize: 16
     },
     icon:{
         position:"absolute",
-        bottom: 7,
+        bottom: 25,
         left: 0
     },
     inputLabel: {
@@ -133,5 +196,8 @@ const styles = StyleSheet.create({
         fontWeight:"bold",
         color: "#0A426E",
         textDecorationColor:"#0A426E"
+    },
+    errorText: {
+        color: "red"
     }
 })

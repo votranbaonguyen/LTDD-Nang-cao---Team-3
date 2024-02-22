@@ -124,6 +124,7 @@ const forgetPassword = async (req, res, next) => {
                 status: 'ok',
                 message: 'Reset password code has been sent, please check your email!',
                 userId: thisUser._id,
+                email
             });
         } catch (error) {
             thisUser.passwordResetToken = undefined;
