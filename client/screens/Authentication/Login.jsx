@@ -1,120 +1,152 @@
-import { Image, Pressable, SafeAreaView, StyleSheet, Text, TextInput, ToastAndroid, View } from 'react-native'
-import React, { useState } from 'react'
+import {
+    Image,
+    Pressable,
+    SafeAreaView,
+    StyleSheet,
+    Text,
+    TextInput,
+    ToastAndroid,
+    View,
+} from 'react-native';
+import React, { useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../redux/authentication/authenticationSlice';
 import { validateError } from '../../util/validation/validateError';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
+//
+import Realm from 'realm';
 
 const re =
-  /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
 
 const Login = () => {
-    const navigate = useNavigation()
-    const dispatch = useDispatch()
-    const {loading} = useSelector(store => store.authenticationSlice)
+    const navigate = useNavigation();
+    const dispatch = useDispatch();
+    const { loading } = useSelector((store) => store.authenticationSlice);
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
     const [error, setError] = useState({
         email: '',
-        password: ''
-    })
+        password: '',
+    });
 
     const validation = () => {
         let tempError = {
             email: '',
-            password: ''
-        }
-        if(!email.toLocaleLowerCase().match(re)) tempError.email = validateError.failEmailVailidate
-        if(email.length === 0) tempError.email = validateError.notEnterEmail
-        
-        if(password.length === 0) tempError.password = validateError.notEnterPassword
-        setError(tempError)
-        if(tempError.email.length === 0 && tempError.password.length === 0)
-            return true
-        else return false
-    }
+            password: '',
+        };
+        if (!email.toLocaleLowerCase().match(re))
+            tempError.email = validateError.failEmailVailidate;
+        if (email.length === 0) tempError.email = validateError.notEnterEmail;
+
+        if (password.length === 0) tempError.password = validateError.notEnterPassword;
+        setError(tempError);
+        if (tempError.email.length === 0 && tempError.password.length === 0) return true;
+        else return false;
+    };
 
     const handleLogin = async () => {
-        let validate = validation()
-        if(validate){
+        // const test = getUserInfo();
+        // if (test) console.log(test);
+
+        let validate = validation();
+        if (validate) {
             const loginData = {
                 email,
-                password
-            }
-            const res = await dispatch(login(loginData))
-            if(res.payload.status === 'ok'){
-                navigate.navigate("Root", {screen:"Home"})
+                password,
+            };
+            const res = await dispatch(login(loginData));
+            if (res.payload.status === 'ok') {
+                navigate.navigate('Root', { screen: 'Home' });
                 ToastAndroid.show('Login success !', ToastAndroid.LONG);
-            }else {
+
+                // saveUserInfo(res.payload);
+            } else {
                 ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
             }
         }
-    }
+    };
 
     const handleInput = (type, text) => {
-        switch(type) {
+        switch (type) {
             case 'email':
-                setEmail(text)
+                setEmail(text);
                 break;
             case 'password':
-                setPassword(text)
+                setPassword(text);
                 break;
         }
-    }
-  return (
-    <SafeAreaView style={styles.container}>
-        <LoadingIndicator loading={loading}/>
-        <View style={styles.logoContainer}>
-            <Image source={require('./../../assets/logo.png')}/>
-        </View>
-        <View style={styles.loginContainer}>
-            <View style={styles.loginWelcomeConatainer}>
-                <Text style={styles.loginWelcomeText}>Welcome, Please login</Text>
+    };
+    return (
+        <SafeAreaView style={styles.container}>
+            <LoadingIndicator loading={loading} />
+            <View style={styles.logoContainer}>
+                <Image source={require('./../../assets/logo.png')} />
             </View>
-            <View style={styles.inputFieldContainer}>
-                <Text style={styles.inputLabel}>Email</Text>
-                <TextInput style={styles.input} onChangeText={(text) => {handleInput('email',text)}}/>
-                <MaterialIcons name="email" size={24} color="#ccc" style={styles.icon}/>
-                <Text style={styles.errorText}>{error.email}</Text>
+            <View style={styles.loginContainer}>
+                <View style={styles.loginWelcomeConatainer}>
+                    <Text style={styles.loginWelcomeText}>Welcome, Please login</Text>
+                </View>
+                <View style={styles.inputFieldContainer}>
+                    <Text style={styles.inputLabel}>Email</Text>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            handleInput('email', text);
+                        }}
+                    />
+                    <MaterialIcons name='email' size={24} color='#ccc' style={styles.icon} />
+                    <Text style={styles.errorText}>{error.email}</Text>
+                </View>
+                <View style={[styles.inputFieldContainer, { marginTop: 30 }]}>
+                    <Text style={styles.inputLabel}>Password</Text>
+                    <TextInput
+                        secureTextEntry={true}
+                        style={styles.input}
+                        onChangeText={(text) => {
+                            handleInput('password', text);
+                        }}
+                    />
+                    <MaterialIcons name='vpn-key' size={24} color='#ccc' style={styles.icon} />
+                    <Text style={styles.errorText}>{error.password}</Text>
+                </View>
+                <View style={styles.buttonContainer}>
+                    <Pressable style={[styles.button, styles.mainButton]} onPress={handleLogin}>
+                        <Text style={styles.mainButtonText}>LOGIN</Text>
+                    </Pressable>
+                    <Pressable
+                        style={[styles.button, styles.secondButton, { marginTop: 15 }]}
+                        onPress={() => navigate.navigate('Register')}
+                    >
+                        <Text style={styles.secondButtonText}>REGISTER</Text>
+                    </Pressable>
+                    <Pressable
+                        style={styles.forgotPassContainer}
+                        onPress={() => navigate.navigate('ForgotPassword')}
+                    >
+                        <Text style={styles.forgotPassText}>Forgot password ?</Text>
+                    </Pressable>
+                </View>
             </View>
-            <View style={[styles.inputFieldContainer,{marginTop: 30}]}>
-                <Text style={styles.inputLabel}>Password</Text>
-                <TextInput secureTextEntry={true} style={styles.input} onChangeText={(text) => {handleInput('password',text)}}/>
-                <MaterialIcons name="vpn-key" size={24} color="#ccc" style={styles.icon} />
-                <Text style={styles.errorText}>{error.password}</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-                <Pressable style={[styles.button,styles.mainButton]} onPress={handleLogin}>
-                    <Text style={styles.mainButtonText}>LOGIN</Text>
-                </Pressable>
-                <Pressable style={[styles.button,styles.secondButton,{marginTop: 15}]} onPress={() => navigate.navigate("Register")}>
-                    <Text style={styles.secondButtonText}>REGISTER</Text>
-                </Pressable>
-                <Pressable style={styles.forgotPassContainer} onPress={() => navigate.navigate("ForgotPassword")}>
-                    <Text style={styles.forgotPassText}>Forgot password ?</Text>
-                </Pressable>
-            </View>
-        </View>
-       
-    </SafeAreaView>
-  )
-}
+        </SafeAreaView>
+    );
+};
 
-export default Login
+export default Login;
 
 const styles = StyleSheet.create({
     container: {
         marginTop: 50,
-        flex: 1
+        flex: 1,
     },
-    logoContainer:{
-        alignItems:"center",
-        flex:1,
-        justifyContent: "center",
+    logoContainer: {
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'center',
     },
     loginContainer: {
         flex: 3,
@@ -125,79 +157,79 @@ const styles = StyleSheet.create({
     },
     loginWelcomeText: {
         fontSize: 20,
-        color: "#0A426E",
-        fontWeight: "bold"
+        color: '#0A426E',
+        fontWeight: 'bold',
     },
     inputFieldContainer: {
-        position:"relative"
+        position: 'relative',
     },
-    input:{
-        borderBottomColor: "#ccc",
+    input: {
+        borderBottomColor: '#ccc',
         borderBottomWidth: 2,
         paddingVertical: 5,
         paddingLeft: 30,
         paddingRight: 10,
-        fontSize: 16
+        fontSize: 16,
     },
-    icon:{
-        position:"absolute",
+    icon: {
+        position: 'absolute',
         bottom: 25,
-        left: 0
+        left: 0,
     },
     inputLabel: {
         fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: 'bold',
     },
     buttonContainer: {
-        marginTop: 30
+        marginTop: 30,
     },
-    button:{
+    button: {
         paddingVertical: 12,
-        width: "100%",
-        alignItems:"center",
+        width: '100%',
+        alignItems: 'center',
         borderRadius: 5,
         shadowColor: '#000',
         shadowOffset: {
-          width: 0,
-          height: 2,
+            width: 0,
+            height: 2,
         },
         shadowOpacity: 0.25,
         shadowRadius: 4,
         elevation: 5,
     },
     mainButton: {
-        backgroundColor: "#0A426E",
+        backgroundColor: '#0A426E',
         borderWidth: 1,
-        borderColor:"#0A426E"
+        borderColor: '#0A426E',
     },
     mainButtonText: {
-        color:"white",
+        color: 'white',
         fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: 'bold',
     },
 
     secondButton: {
-        backgroundColor: "white",
+        backgroundColor: 'white',
         borderWidth: 1,
-        borderColor:"#ccc"
+        borderColor: '#ccc',
     },
-    
+
     secondButtonText: {
-        color:"#0A426E",
+        color: '#0A426E',
         fontSize: 15,
-        fontWeight: "bold"
+        fontWeight: 'bold',
     },
     forgotPassContainer: {
         marginTop: 5,
-        paddingVertical: 10
+        paddingVertical: 10,
     },
     forgotPassText: {
-        textDecorationLine:"underline",
-        fontWeight:"bold",
-        color: "#0A426E",
-        textDecorationColor:"#0A426E"
+        textDecorationLine: 'underline',
+        fontWeight: 'bold',
+        color: '#0A426E',
+        textDecorationColor: '#0A426E',
     },
     errorText: {
-        color: "red"
-    }
-})
+        color: 'red',
+    },
+});
