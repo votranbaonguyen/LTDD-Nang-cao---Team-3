@@ -1,8 +1,29 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Section from './Section';
+import { deleteUserInfo, getUserInfo, saveUserInfo } from '../../util/realm/userRealm';
+import { BSON } from 'realm';
+import { useNavigation } from '@react-navigation/native';
+
+// const fake = {
+//     _id: BSON.ObjectID('65d6ed58b07757a158cfeca0'),
+//     name: 'thoty',
+//     email: 'thoty@gmail.com',
+//     accessToken: 'abcdef',
+// };
 
 const Home = () => {
+    const navigate = useNavigation();
+
+    const handleCheckout = () => {
+        const test = getUserInfo();
+        if (test) console.log(test);
+    };
+    const handleLogout = () => {
+        deleteUserInfo();
+        navigate.navigate('Login');
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -38,7 +59,13 @@ const Home = () => {
                 />
             </View>
             <View style={styles.buttonContainer}>
-                <Pressable style={[styles.button, styles.mainButton]}>
+                <Pressable
+                    onPress={handleLogout}
+                    style={[styles.button, styles.mainButton, { marginBottom: 10 }]}
+                >
+                    <Text style={styles.mainButtonText}>LOG OUT</Text>
+                </Pressable>
+                <Pressable onPress={handleCheckout} style={[styles.button, styles.mainButton]}>
                     <Text style={styles.mainButtonText}>CHECKOUT</Text>
                 </Pressable>
             </View>
@@ -86,9 +113,9 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         position: 'absolute',
-        top: 640,
         left: 20,
         right: 20,
+        bottom: 30,
     },
     button: {
         paddingVertical: 15,

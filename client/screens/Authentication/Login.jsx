@@ -8,7 +8,7 @@ import {
     ToastAndroid,
     View,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,7 +16,8 @@ import { login } from '../../redux/authentication/authenticationSlice';
 import { validateError } from '../../util/validation/validateError';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 //
-import Realm from 'realm';
+import Realm, { BSON } from 'realm';
+import { getUserInfo, saveUserInfo } from '../../util/realm/userRealm';
 
 const re =
     /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -34,6 +35,19 @@ const Login = () => {
         password: '',
     });
 
+    let rememberUser;
+    useEffect(
+        function () {
+            rememberUser = getUserInfo();
+            if (rememberUser) {
+                // check if token is valid, or check if user authenticated
+                // anh Nguyên viết giúp em hàm redux call api authen chỗ này iii :)) lười mò redux quá.
+                navigate.navigate('Root', { screen: 'Home' });
+            }
+        },
+        [rememberUser, getUserInfo, navigate]
+    );
+
     const validation = () => {
         let tempError = {
             email: '',
@@ -50,9 +64,6 @@ const Login = () => {
     };
 
     const handleLogin = async () => {
-        // const test = getUserInfo();
-        // if (test) console.log(test);
-
         let validate = validation();
         if (validate) {
             const loginData = {
@@ -64,7 +75,9 @@ const Login = () => {
                 navigate.navigate('Root', { screen: 'Home' });
                 ToastAndroid.show('Login success !', ToastAndroid.LONG);
 
-                // saveUserInfo(res.payload);
+                const token = res.payload.accessToken;
+                const userData = res.payload.user;
+                saveUserInfo({ ...userData, _id: BSON.ObjectID(userData._id), accessToken: token });
             } else {
                 ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
             }
@@ -94,6 +107,7 @@ const Login = () => {
                 <View style={styles.inputFieldContainer}>
                     <Text style={styles.inputLabel}>Email</Text>
                     <TextInput
+                        value={email}
                         style={styles.input}
                         onChangeText={(text) => {
                             handleInput('email', text);

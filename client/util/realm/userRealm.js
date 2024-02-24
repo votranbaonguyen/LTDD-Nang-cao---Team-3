@@ -4,32 +4,37 @@ import { User } from '../../models/userSchema';
 const realm = new Realm({ schema: [User] });
 
 const saveUserInfo = (user) => {
-    const currentUser = realm.objects('User')[0];
-    if (!currentUser) {
-        realm.write(() => {
-            realm.create('User', {
+    realm.write(() => {
+        realm.create(
+            'User',
+            {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 token: user.accessToken,
-            });
-        });
-    } else {
-        currentUser._id = user._id;
-        currentUser.name = user.name;
-        currentUser.email = user.email;
-        currentUser.token = user.accessToken;
-    }
+            },
+            true
+        );
+    });
+    console.log('write ok');
 };
 
 const getUserInfo = () => {
+    console.log('read ok');
+
     const user = realm.objects('User')[0];
     return user ? user : null;
 };
 
 const deleteUserInfo = () => {
-    const user = realm.objects('User')[0];
-    if (user) realm.delete(user);
+    try {
+        realm.write(() => {
+            const user = realm.objects('User')[0];
+            if (user) realm.delete(user);
+        });
+    } catch (error) {
+        console.error('Error deleting user info:', error);
+    }
 };
 
 export { saveUserInfo, getUserInfo, deleteUserInfo };
