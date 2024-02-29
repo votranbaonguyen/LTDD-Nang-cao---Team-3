@@ -31,8 +31,15 @@ const Home = () => {
                 <Text style={styles.name}>Bao Nguyen</Text>
             </View>
             <View style={styles.main}>
-                <View style={{ marginTop: 25, marginLeft: 40, marginBottom: 25 }}>
-                    <Text style={{ fontSize: 25, fontWeight: 'bold', letterSpacing: 1 }}>
+                <View
+                    style={{
+                        marginTop: 25,
+                        marginBottom: 25,
+                        marginLeft: 'auto',
+                        marginRight: 'auto',
+                    }}
+                >
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', letterSpacing: 1 }}>
                         Lịch dạy hôm nay
                     </Text>
                 </View>
@@ -84,7 +91,8 @@ const styles = StyleSheet.create({
         left: 0,
     },
     header: {
-        marginTop: 15,
+        marginTop: 45,
+        marginLeft: 40,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
@@ -92,24 +100,25 @@ const styles = StyleSheet.create({
         marginHorizontal: 20,
     },
     image: {
-        borderWidth: 2,
+        borderWidth: 1,
         borderRadius: 9999,
         borderColor: 'white',
-        width: 80,
-        height: 80,
+        width: 60,
+        height: 60,
     },
     name: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 30,
+        fontSize: 17,
+        letterSpacing: 2,
     },
     main: {
         position: 'relative',
         top: 30,
         backgroundColor: 'white',
         height: '100%',
-        borderTopLeftRadius: 70,
-        borderTopRightRadius: 70,
+        borderTopLeftRadius: 35,
+        borderTopRightRadius: 35,
     },
     buttonContainer: {
         position: 'absolute',
