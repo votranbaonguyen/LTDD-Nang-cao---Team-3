@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Home from '../Home/Home';
 import { Text } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
+import User from '../User/User';
 
 const Tab = createBottomTabNavigator();
 
@@ -36,7 +37,7 @@ const BottomNavigate = () => {
             />
             <Tab.Screen
                 name='User'
-                component={Home}
+                component={User}
                 options={{
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
