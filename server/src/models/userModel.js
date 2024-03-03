@@ -22,8 +22,9 @@ const userSchema = new mongoose.Schema({
     role: {
         type: String,
         enum: {
-            values: ['guest', 'admin'],
-            message: 'Roles are only: guest, admin',
+            values: ['student', 'teacher', 'admin'],
+            message:
+                'Roles are only: student, teacher, admin (You can not set this role)',
         },
         default: 'guest',
     },
