@@ -10,6 +10,7 @@ import { store } from "./redux/store";
 import BottomNavigate from "./screens/BottomNavigate/BottomNavigate";
 import ForgotPassword from "./screens/Authentication/ForgotPassword";
 import OTPEnter from "./screens/Authentication/OTPEnter";
+import Class from "./screens/Class/Class";
 
 const Stack = createStackNavigator();
 
@@ -18,7 +19,7 @@ export default function App() {
     <Provider store={store}>
     <NavigationContainer>
       <Stack.Navigator>
-        
+      
         <Stack.Screen
           options={{
             headerShown: false,
@@ -56,6 +57,14 @@ export default function App() {
           }}
           component={BottomNavigate}
         />
+        <Stack.Screen
+          options={{
+            headerShown:false
+          }}
+          name="Class"
+          component={Class}
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
     </Provider>

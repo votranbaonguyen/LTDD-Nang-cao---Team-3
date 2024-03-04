@@ -1,9 +1,10 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Section from './Section';
 import { deleteUserInfo, getUserInfo, saveUserInfo } from '../../util/realm/userRealm';
 import { BSON } from 'realm';
 import { useNavigation } from '@react-navigation/native';
+import { FontAwesome } from '@expo/vector-icons';
 
 // const fake = {
 //     _id: BSON.ObjectID('65d6ed58b07757a158cfeca0'),
@@ -14,7 +15,9 @@ import { useNavigation } from '@react-navigation/native';
 
 const Home = () => {
     const navigate = useNavigation();
+    const [userInfo, setUserInfo] = useState(getUserInfo())
 
+    console.log(userInfo)
     const handleCheckout = () => {
         const test = getUserInfo();
         if (test) console.log(test);
@@ -27,8 +30,10 @@ const Home = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <Image source={require('./../../assets/logo.png')} style={styles.image} />
-                <Text style={styles.name}>Bao Nguyen</Text>
+                <View style={styles.avatarContainer} >
+                    <FontAwesome name='user' size={40} color='#0A426E' />
+                </View>
+                <Text style={styles.name}>{userInfo.name}</Text>
             </View>
             <View style={styles.main}>
                 <View
@@ -39,8 +44,8 @@ const Home = () => {
                         marginRight: 'auto',
                     }}
                 >
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', letterSpacing: 1 }}>
-                        Lịch dạy hôm nay
+                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+                        Today's Class
                     </Text>
                 </View>
                 <Section
@@ -85,31 +90,33 @@ export default Home;
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#0A426E',
-        height: '100%',
+        flex: 1,
         position: 'relative',
         top: 0,
         left: 0,
     },
     header: {
-        marginTop: 45,
-        marginLeft: 40,
-        display: 'flex',
+        paddingTop: 40,
+        marginLeft: 20,
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 30,
         marginHorizontal: 20,
     },
-    image: {
+    avatarContainer: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
         borderWidth: 1,
-        borderRadius: 9999,
         borderColor: 'white',
-        width: 60,
-        height: 60,
+        backgroundColor:"white",
+        alignItems:"center",
+        justifyContent:"center",
+        marginRight: 20
     },
     name: {
         color: 'white',
         fontWeight: 'bold',
-        fontSize: 17,
+        fontSize: 18,
         letterSpacing: 2,
     },
     main: {

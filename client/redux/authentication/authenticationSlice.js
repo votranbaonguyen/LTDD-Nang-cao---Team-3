@@ -88,7 +88,7 @@ export const register = createAsyncThunk(
   );
 
 export const authenticationSlice = createSlice({
-    name: 'counter',
+    name: 'authentication',
     initialState,
     reducers: {
       setRegisterSuccess: (state) => {

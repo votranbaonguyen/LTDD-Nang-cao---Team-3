@@ -41,7 +41,6 @@ const Login = () => {
             rememberUser = getUserInfo();
             if (rememberUser) {
                 // check if token is valid, or check if user authenticated
-                // anh Nguyên viết giúp em hàm redux call api authen chỗ này iii :)) lười mò redux quá.
                 navigate.navigate('Root', { screen: 'Home' });
             }
         },
