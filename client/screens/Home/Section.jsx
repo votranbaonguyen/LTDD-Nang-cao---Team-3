@@ -1,10 +1,12 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { Entypo } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-export default function Section({ time, name, teacher, room, isChecked }) {
+export default function Section({ time, name, teacher, room, isChecked, classId, isAllClass }) {
+    const navigate = useNavigation()
     return (
-        <View>
+        <Pressable onPress={() => navigate.navigate("Class", {classId})}>
             <View style={styles.container}>
                 <View
                     style={{
@@ -70,21 +72,26 @@ export default function Section({ time, name, teacher, room, isChecked }) {
                                 }}
                             >
                                 <Text style={{ fontSize: 11, fontWeight: '200' }}>Giảng viên:</Text>
-                                <Text style={{ fontWeight: '800' }}>{teacher}</Text>
+                                <Text style={{ fontWeight: '800' }}>{teacher.name}</Text>
                             </View>
                         </View>
                     </View>
+                    {isAllClass ?
+                    <></>
+                    :
                     <View style={styles.check}>
-                        <Text style={{ fontSize: 11, fontWeight: '200' }}>Điểm danh</Text>
-                        <Entypo
-                            name={isChecked ? 'check' : 'cross'}
-                            size={isChecked ? 22 : 30}
-                            color={isChecked ? 'green' : 'red'}
-                        />
-                    </View>
+                    <Text style={{ fontSize: 11, fontWeight: '200' }}>Điểm danh</Text>
+                    <Entypo
+                        name={isChecked ? 'check' : 'cross'}
+                        size={isChecked ? 22 : 30}
+                        color={isChecked ? 'green' : 'red'}
+                    />
+                </View>
+                    }
+                   
                 </View>
             </View>
-        </View>
+        </Pressable>
     );
 }
 

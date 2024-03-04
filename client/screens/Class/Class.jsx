@@ -1,13 +1,12 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { Feather } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import ClassSection from '../../components/Class/ClassSection';
-import { getUserInfo } from '../../util/storage/userStorage';
 import { useDispatch, useSelector } from 'react-redux';
 import { getClassInfo } from '../../redux/class/classSlice';
 
-const Class = () => {
+const Class = ({navigation, route}) => {
     const dispatch = useDispatch();
 
     const [selectedSection, setSelectedSection] = useState();
@@ -27,7 +26,7 @@ const Class = () => {
     };
 
     useEffect(() => {
-        dispatch(getClassInfo('65e4652bfa6ef7eb94593d71'));
+        dispatch(getClassInfo(route.params.classId));
     }, []);
 
     useEffect(() => {
@@ -35,10 +34,10 @@ const Class = () => {
     }, [classInfo]);
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
+            <Pressable style={styles.header} onPress={() => navigation.goBack()}>
                 <Feather name='arrow-left' size={27} color='black' />
                 <Text style={styles.headerText}>A2-301</Text>
-            </View>
+            </Pressable>
             <View style={styles.body}>
                 <View style={styles.classDetailContainer}>
                     <Text style={styles.className}>{classInfo?.name}</Text>

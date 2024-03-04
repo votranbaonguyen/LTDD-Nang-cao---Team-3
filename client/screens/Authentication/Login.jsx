@@ -18,6 +18,7 @@ import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 //
 import Realm, { BSON } from 'realm';
 import { getUserInfo, saveUserInfo } from '../../util/storage/userStorage';
+import { updateUserInfoAfterLogin } from '../../redux/user/userSlice';
 
 const re =
     /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -40,7 +41,7 @@ const Login = () => {
         async function checkAuth() {
             rememberUser = await getUserInfo();
             if (rememberUser) {
-                // check if token is valid, or check if user authenticated
+                dispatch(updateUserInfoAfterLogin(rememberUser))
                 navigate.navigate('Root', { screen: 'Home' });
             }
         }
@@ -76,6 +77,10 @@ const Login = () => {
 
                 const token = res.payload.accessToken;
                 const userData = res.payload.user;
+                dispatch(updateUserInfoAfterLogin({
+                    ...userData,
+                    accessToken: token,
+                }))
                 await saveUserInfo({
                     ...userData,
                     accessToken: token,
