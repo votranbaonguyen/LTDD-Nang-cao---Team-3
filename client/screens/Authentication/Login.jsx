@@ -17,7 +17,7 @@ import { validateError } from '../../util/validation/validateError';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 //
 import Realm, { BSON } from 'realm';
-import { getUserInfo, saveUserInfo } from '../../util/realm/userRealm';
+import { getUserInfo, saveUserInfo } from '../../util/storage/userStorage';
 
 const re =
     /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -36,16 +36,16 @@ const Login = () => {
     });
 
     let rememberUser;
-    useEffect(
-        function () {
-            rememberUser = getUserInfo();
+    useEffect(() => {
+        async function checkAuth() {
+            rememberUser = await getUserInfo();
             if (rememberUser) {
                 // check if token is valid, or check if user authenticated
                 navigate.navigate('Root', { screen: 'Home' });
             }
-        },
-        [rememberUser, getUserInfo, navigate]
-    );
+        }
+        checkAuth();
+    }, [rememberUser, getUserInfo, navigate]);
 
     const validation = () => {
         let tempError = {
@@ -76,7 +76,10 @@ const Login = () => {
 
                 const token = res.payload.accessToken;
                 const userData = res.payload.user;
-                saveUserInfo({ ...userData, _id: BSON.ObjectID(userData._id), accessToken: token });
+                await saveUserInfo({
+                    ...userData,
+                    accessToken: token,
+                });
             } else {
                 ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
             }

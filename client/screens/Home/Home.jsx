@@ -1,7 +1,7 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
 import Section from './Section';
-import { deleteUserInfo, getUserInfo, saveUserInfo } from '../../util/realm/userRealm';
+import { deleteUserInfo, getUserInfo } from '../../util/storage/userStorage';
 import { BSON } from 'realm';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
@@ -15,26 +15,26 @@ import { FontAwesome } from '@expo/vector-icons';
 
 const Home = () => {
     const navigate = useNavigation();
-    const [userInfo, setUserInfo] = useState(getUserInfo())
+    const [userInfo, setUserInfo] = useState(getUserInfo());
 
-    console.log(userInfo)
-    const handleCheckout = () => {
-        const test = getUserInfo();
+    console.log(userInfo);
+    const handleCheckout = async () => {
+        const test = await getUserInfo();
         if (test) console.log(test);
     };
-    const handleLogout = () => {
-        deleteUserInfo();
+    const handleLogout = async () => {
+        await deleteUserInfo();
         navigate.navigate('Login');
     };
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
+            {/* <View style={styles.header}>
                 <View style={styles.avatarContainer} >
                     <FontAwesome name='user' size={40} color='#0A426E' />
                 </View>
                 <Text style={styles.name}>{userInfo.name}</Text>
-            </View>
+            </View> */}
             <View style={styles.main}>
                 <View
                     style={{
@@ -44,9 +44,7 @@ const Home = () => {
                         marginRight: 'auto',
                     }}
                 >
-                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
-                        Today's Class
-                    </Text>
+                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Today's Class</Text>
                 </View>
                 <Section
                     time={'7:00 AM'}
@@ -108,10 +106,10 @@ const styles = StyleSheet.create({
         borderRadius: 35,
         borderWidth: 1,
         borderColor: 'white',
-        backgroundColor:"white",
-        alignItems:"center",
-        justifyContent:"center",
-        marginRight: 20
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 20,
     },
     name: {
         color: 'white',
