@@ -5,9 +5,20 @@ const classSchema = new Schema({
         type: String,
         required: [true, 'Please fill class name'],
     },
+    room: {
+        type: String,
+        default: 'A5-401',
+    },
+    startTime: {
+        type: Number,
+        default: 9,
+    },
+    endTime: {
+        type: Number,
+        default: 12,
+    },
     section: [
         {
-            _id: false,
             name: {
                 type: String,
                 required: [true, 'Please fill section name'],
@@ -16,10 +27,12 @@ const classSchema = new Schema({
                 type: String,
                 required: [true, 'Please fill section detail'],
             },
-            assignment: {
-                type: Schema.ObjectId,
-                ref: 'Assignment',
-            },
+            assignment: [
+                {
+                    type: Schema.ObjectId,
+                    ref: 'Assignment',
+                },
+            ],
         },
     ],
     member: [
@@ -28,6 +41,10 @@ const classSchema = new Schema({
             ref: 'User',
         },
     ],
+    teacher: {
+        type: Schema.ObjectId,
+        ref: 'User',
+    },
 });
 
 const classModel = model('Class', classSchema);

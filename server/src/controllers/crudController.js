@@ -54,6 +54,23 @@ const updateOne = (Model) => async (req, res, next) => {
     }
 };
 
+const updateMany = (Model) => async (req, res, next) => {
+    try {
+        const doc = await Model.updateMany({}, req.body, {
+            new: true,
+            runValidators: true,
+        });
+
+        res.status(200).send({
+            status: 'ok',
+            data: doc,
+        });
+    } catch (error) {
+        console.log(error);
+        return next(new CustomError(error));
+    }
+};
+
 const getOne = (Model, populateOptions) => async (req, res, next) => {
     try {
         let query = Model.findById(req.params.id);
@@ -97,4 +114,5 @@ module.exports = {
     updateOne,
     getOne,
     getAll,
+    updateMany,
 };

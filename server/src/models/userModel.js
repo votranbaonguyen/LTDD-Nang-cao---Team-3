@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema({
             message:
                 'Roles are only: student, teacher, admin (You can not set this role)',
         },
-        default: 'guest',
+        default: 'student',
     },
     passwordResetToken: {
         type: String,
