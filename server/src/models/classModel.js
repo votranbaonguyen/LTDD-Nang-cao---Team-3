@@ -27,10 +27,12 @@ const classSchema = new Schema({
                 type: String,
                 required: [true, 'Please fill section detail'],
             },
-            documentUrl: {
-                type: String,
-                default: 'https://abc.com/image',
-            },
+            documentUrl: [
+                {
+                    type: String,
+                    default: 'https://abc.com/image',
+                },
+            ],
             assignment: [
                 {
                     type: Schema.ObjectId,
