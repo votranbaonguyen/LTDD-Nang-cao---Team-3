@@ -13,7 +13,10 @@ const {
 const createClass = createOne(classModel);
 const updateClass = updateOne(classModel);
 const updateManyClass = updateMany(classModel);
-const getOneClass = getOne(classModel, [{ path: 'section.assignment' }]);
+const getOneClass = getOne(classModel, [
+    { path: 'section.assignment' },
+    { path: 'teacher' },
+]);
 const getAllClass = getAll(classModel);
 const deleteClass = deleteOne(classModel);
 

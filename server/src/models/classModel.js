@@ -65,6 +65,16 @@ const classSchema = new Schema({
     },
 });
 
+// middlewares
+classSchema.pre(/^find/, function (next) {
+    this.populate([
+        { path: 'section.assignment' },
+        { path: 'teacher', select: '-password -passwordChangedAt' },
+    ]);
+
+    next();
+});
+
 const classModel = model('Class', classSchema);
 module.exports = {
     classModel,
