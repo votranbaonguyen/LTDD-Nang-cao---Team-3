@@ -6,6 +6,7 @@ const {
     getOneClass,
     deleteClass,
     updateManyClass,
+    getClassByStudentId,
 } = require('../controllers/classController');
 const { authentication } = require('../middlewares/auth/authenticate');
 
@@ -15,6 +16,7 @@ classRouter.use(authentication);
 
 classRouter.route('/').post(createClass).get(getAllClass);
 classRouter.route('/many').patch(updateManyClass);
+classRouter.route('/student/:id').get(getClassByStudentId);
 classRouter.route('/:id').patch(updateClass).get(getOneClass).delete(deleteClass);
 
 module.exports = {

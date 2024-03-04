@@ -9,13 +9,34 @@ const classSchema = new Schema({
         type: String,
         default: 'A5-401',
     },
+    dayOfWeek: {
+        type: String,
+        enum: {
+            values: [
+                'monday',
+                'tuesday',
+                'wednesday',
+                'thursday',
+                'friday',
+                'saturday',
+                'sunday',
+            ],
+            message:
+                "status are only: 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'",
+        },
+        default: 'on-time',
+    },
+    startDay: {
+        type: Date,
+        default: new Date('2024-01-01'),
+    },
     startTime: {
-        type: Number,
-        default: 9,
+        type: String,
+        default: '9:15',
     },
     endTime: {
-        type: Number,
-        default: 12,
+        type: String,
+        default: '16:20',
     },
     section: [
         {
