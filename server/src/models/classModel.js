@@ -12,19 +12,10 @@ const classSchema = new Schema({
     dayOfWeek: {
         type: String,
         enum: {
-            values: [
-                'monday',
-                'tuesday',
-                'wednesday',
-                'thursday',
-                'friday',
-                'saturday',
-                'sunday',
-            ],
-            message:
-                "status are only: 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'",
+            values: [0, 1, 2, 3, 4, 5, 6],
+            message: 'day week is only from 0 to 6',
         },
-        default: 'on-time',
+        default: 0,
     },
     startDay: {
         type: Date,
