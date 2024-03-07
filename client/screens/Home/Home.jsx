@@ -35,7 +35,7 @@ const Home = () => {
 
     const renderClassList = () => {
         if (activeNav === 'one') {
-            if (todayClassList.length > 0) {
+            if (todayClassList?.length > 0) {
                 return todayClassList.map((classDetail) => {
                     return (
                         <Section
@@ -57,7 +57,7 @@ const Home = () => {
                     </View>
                 );
         } else if (activeNav === 'all') {
-            if (allClassList.length > 0) {
+            if (allClassList?.length > 0) {
                 return allClassList.map((classDetail) => {
                     return (
                         <Section

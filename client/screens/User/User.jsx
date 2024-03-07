@@ -3,6 +3,7 @@ import React from 'react';
 import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { deleteUserInfo } from '../../util/storage/userStorage';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector } from 'react-redux';
 
 function MenuItem({ name, icon, color, onClick }) {
     return (
@@ -43,6 +44,7 @@ function MenuItem({ name, icon, color, onClick }) {
 
 export default function User() {
     const navigate = useNavigation();
+    const { userInfo, loading } = useSelector((store) => store.userSlice);
 
     const handleLogout = async () => {
         await deleteUserInfo();
@@ -65,10 +67,10 @@ export default function User() {
                     <FontAwesome name='user' size={50} color='white' />
                 </View>
                 <Text style={{ fontSize: 25, fontWeight: '900', letterSpacing: 1, marginTop: 10 }}>
-                    Bao Nguyen
+                    {userInfo ? userInfo.name : 'Loading...'}
                 </Text>
                 <Text style={{ fontWeight: '300', letterSpacing: 2 }}>
-                    20110597@student.hcmute.edu.vn
+                    {userInfo ? userInfo.email : 'Loading...'}
                 </Text>
             </View>
 
@@ -85,6 +87,7 @@ export default function User() {
                 <MenuItem
                     name='Change Password'
                     icon={<FontAwesome name='lock' size={20} color='black' />}
+                    onClick={() => navigate.navigate('ChangePassword')}
                 ></MenuItem>
                 <MenuItem
                     color='red'
