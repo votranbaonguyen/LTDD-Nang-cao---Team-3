@@ -27,10 +27,10 @@ const assignmentSchema = new Schema({
             status: {
                 type: String,
                 enum: {
-                    values: ['on-time', 'late'],
-                    message: "status are only: 'on-time', 'late'",
+                    values: ['not-submit', 'on-time', 'late'],
+                    message: "status are only:'not-submit', 'on-time', 'late'",
                 },
-                default: 'on-time',
+                default: 'not-submit',
             },
             student: {
                 type: Schema.ObjectId,

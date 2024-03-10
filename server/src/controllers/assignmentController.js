@@ -11,14 +11,26 @@ const updateAssignment = async (req, res, next) => {
         const updateField = req.body;
         let newDetail;
         if (Object.keys(updateField).includes('detail')) {
-            newDetail = updateItem.toObject().detail.map((ele) => {
-                if (updateItem.closeTime < ele.submitTime)
-                    return { ...ele, status: 'late' };
+            newDetail = updateField.detail.map((ele) => {
+                if (ele.status != 'not-submit') {
+                    if (updateItem.closeTime < new Date(ele.submitTime)) {
+                        return { ...ele, status: 'late' };
+                    } else {
+                        return { ...ele, status: 'on-time' };
+                    }
+                }
                 return ele;
             });
+            updateField.detail = newDetail;
         }
-        updateItem.detail = newDetail;
-        const result = await updateItem.save();
+        const result = await assignmentModel.findByIdAndUpdate(
+            req.params.id,
+            updateField,
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
 
         res.status(200).send({
             status: 'ok',
