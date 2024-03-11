@@ -7,7 +7,9 @@ const initialState = {
     loading: false,
     classInfo: null,
     todayClassList: [],
-    allClassList: []
+    allClassList: [],
+    uploadDocumentsList: [],
+    newAssignmentList: []
 };
 
 export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classId) => {
@@ -65,9 +67,50 @@ export const getAllClassByTeacherId = createAsyncThunk('class/getAllClassByTeach
     }
 })
 
+export const updateOneSection = createAsyncThunk('class/updateOneSection', async ({classId,data}) =>{
+    try {
+        const userInfo = await getUserInfo();
+        let res = await axios.patch(classAPI.updateOneSection(classId), data, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return error.response.data;
+    }
+})
+
+export const createOneSection = createAsyncThunk('class/createOneSection', async ({classId,data}) =>{
+    try {
+        const userInfo = await getUserInfo();
+        let res = await axios.patch(classAPI.updateOneSection(classId), data, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return error.response.data;
+    }
+})
+
+
 export const classSlice = createSlice({
     name: 'class',
     initialState,
+    reducers: {
+        removeDocumentFile: (state,action) => {
+            const index = state.classInfo.section.findIndex((section) => section._id === action.payload.sectionId)
+            if(index !== -1) {
+                state.classInfo.section[index].documentUrl.splice(action.payload.documentIndex,1)
+            }
+        },
+    },
     extraReducers: (builder) => {
         builder.addCase(getClassInfo.pending, (state, action) => {
             state.loading = true;
@@ -111,6 +154,6 @@ export const classSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {} = classSlice.actions;
+export const {removeDocumentFile} = classSlice.actions;
 
 export default classSlice.reducer;

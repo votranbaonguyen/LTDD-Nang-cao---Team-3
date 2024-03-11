@@ -30,8 +30,12 @@ const Home = () => {
     };
 
     const handleChangeTab = (type) => {
-        setActiveNav(type);
-    };
+        if(type === "one")
+            dispatch(getTodayClassList())
+        else if(type === "all")
+            dispatch(getAllClassByTeacherId())
+        setActiveNav(type)
+    }
 
     const renderClassList = () => {
         if (activeNav === 'one') {

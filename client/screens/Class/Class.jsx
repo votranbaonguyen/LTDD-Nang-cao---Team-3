@@ -5,12 +5,18 @@ import { Picker } from '@react-native-picker/picker';
 import ClassSection from '../../components/Class/ClassSection';
 import { useDispatch, useSelector } from 'react-redux';
 import { getClassInfo } from '../../redux/class/classSlice';
+import EditSection from '../../components/Class/EditSection';
+import LoadingIndicator from '../../util/Loading/LoadingIndicator';
+import CreateSection from '../../components/Class/CreateSection';
 
-const Class = ({navigation, route}) => {
+const Class = ({ navigation, route }) => {
     const dispatch = useDispatch();
 
     const [selectedSection, setSelectedSection] = useState();
-    const { classInfo } = useSelector((store) => store.classSlice);
+    const [editing, setEditing] = useState(false);
+    const [creating, setCreating] = useState(false);
+    const { classInfo, loading } = useSelector((store) => store.classSlice);
+    const [createEditLoading, setCreateEditLoading] = useState(false)
     const generateSectionDropdown = () => {
         if (classInfo)
             return classInfo.section.map((section) => {
@@ -25,15 +31,30 @@ const Class = ({navigation, route}) => {
         } else return null;
     };
 
+    const handleCancel = () => {
+        setEditing(false);
+        setCreating(false)
+        dispatch(getClassInfo(route.params.classId));
+    }
+
+    const startLoading = () => {
+        setCreateEditLoading(true)
+    }
+    const stopLoading = () => {
+        setCreateEditLoading(false)
+    }
+
     useEffect(() => {
         dispatch(getClassInfo(route.params.classId));
     }, []);
 
     useEffect(() => {
         setSelectedSection(classInfo?.section[0]._id);
-    }, [classInfo]);
+    }, []);
     return (
         <SafeAreaView style={styles.container}>
+            <LoadingIndicator loading={loading} />
+            <LoadingIndicator loading={createEditLoading} />
             <Pressable style={styles.header} onPress={() => navigation.goBack()}>
                 <Feather name='arrow-left' size={27} color='black' />
                 <Text style={styles.headerText}>A2-301</Text>
@@ -44,20 +65,57 @@ const Class = ({navigation, route}) => {
                     <Text style={styles.classTime}>7:00 AM - 9:15 AM</Text>
                 </View>
                 <View style={styles.sectionDropdownContainer}>
-                    <Text style={styles.sectionTitle}>Section</Text>
-                    <View style={styles.picker}>
-                        <Picker
-                            selectedValue={selectedSection}
-                            onValueChange={(itemValue, itemIndex) => {
-                                setSelectedSection(itemValue);
-                            }}
-                        >
-                            {generateSectionDropdown()}
-                        </Picker>
-                    </View>
+                    <Text style={styles.sectionTitle}>{creating ? "Create New Section" : "Section"}</Text>
+                    {creating ?
+                        <></>
+                        :
+                        <View style={styles.picker}>
+
+                            <Picker
+                                selectedValue={selectedSection}
+                                onValueChange={(itemValue, itemIndex) => {
+                                    setSelectedSection(itemValue);
+                                }}
+                                enabled={editing ? false : true}
+                            >
+                                {generateSectionDropdown()}
+                            </Picker>
+
+
+                        </View>
+                    }
                 </View>
-                <ClassSection sectionData={getSectionData()} />
+                {
+                    creating ?
+                        <CreateSection cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} />
+                        :
+                        editing ?
+                            <EditSection sectionData={getSectionData()} cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} /> :
+                            <ClassSection sectionData={getSectionData()} />
+                }
+
+                <View style={styles.buttonContainer}>
+                    {
+                        editing || creating ?
+                            <>
+
+                            </>
+
+                            :
+                            <View style={styles.buttonContainer}>
+                                <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
+                                    <Text style={styles.secondButtonText}>CREATE</Text>
+                                </Pressable>
+                                <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
+                                    <Text style={styles.mainButtonText}>EDIT</Text>
+                                </Pressable>
+                            </View>
+                    }
+
+                </View>
+
             </View>
+
         </SafeAreaView>
     );
 };
@@ -118,5 +176,49 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#ccc',
         borderRadius: 5,
+    },
+    button: {
+        paddingVertical: 12,
+        flex: 1,
+        alignItems: 'center',
+        borderRadius: 5,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    mainButton: {
+        backgroundColor: '#0A426E',
+        borderWidth: 1,
+        borderColor: '#0A426E',
+    },
+    mainButtonText: {
+        color: 'white',
+        fontSize: 15,
+        fontWeight: 'bold',
+    },
+    buttonContainer: {
+        position: 'absolute',
+        bottom: 15,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 20,
+        flexDirection: "row",
+        gap: 10
+    },
+    secondButton: {
+        backgroundColor: 'white',
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+
+    secondButtonText: {
+        color: '#0A426E',
+        fontSize: 15,
+        fontWeight: 'bold',
     },
 });

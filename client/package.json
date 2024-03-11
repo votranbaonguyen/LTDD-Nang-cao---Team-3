@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.21.0",
+    "@react-native-community/datetimepicker": "7.6.1",
     "@react-native-masked-view/masked-view": "^0.3.1",
     "@react-native-picker/picker": "2.6.1",
     "@react-navigation/bottom-tabs": "^6.5.12",
@@ -24,6 +25,7 @@
     "eas-cli": "^7.3.0",
     "expo": "~50.0.7",
     "expo-dev-client": "~3.3.8",
+    "expo-document-picker": "~11.10.1",
     "expo-file-system": "~16.0.7",
     "expo-status-bar": "~1.11.1",
     "metro-core": "^0.80.6",

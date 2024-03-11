@@ -76,9 +76,10 @@ export const forgotPassword = createAsyncThunk('authentication/forgotPassword', 
     }
 });
 
-export const resetPassword = createAsyncThunk('authentication/resetPassword', async (data) => {
-    try {
-        console.log(authenticationAPI.resetPassword(data.userId));
+  export const resetPassword = createAsyncThunk(
+    "authentication/resetPassword",
+    async (data) => {
+      try {
         let newData = {
             newPassword: data.newPassword,
             resetToken: data.resetToken,
