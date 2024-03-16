@@ -9,19 +9,39 @@ const updateAssignment = async (req, res, next) => {
         if (!updateItem) return next(new CustomError('No document with this id', 404));
 
         const updateField = req.body;
-        let newDetail;
         if (Object.keys(updateField).includes('detail')) {
-            newDetail = updateField.detail.map((ele) => {
-                if (ele.status != 'not-submit') {
-                    if (updateItem.closeTime < new Date(ele.submitTime)) {
-                        return { ...ele, status: 'late' };
-                    } else {
-                        return { ...ele, status: 'on-time' };
+            const oldDetailList = updateItem.detail;
+            const updateDetail = updateField.detail[0];
+            let newDetailList = [];
+
+            if (updateItem.closeTime < new Date(updateDetail.submitTime)) {
+                updateDetail.status = 'late';
+            } else {
+                updateDetail.status = 'on-time';
+            }
+
+            if (updateDetail?._id) {
+                newDetailList = oldDetailList.map((item) => {
+                    if (updateDetail._id === item._id.toString()) {
+                        return updateDetail;
                     }
-                }
-                return ele;
-            });
-            updateField.detail = newDetail;
+                    return item;
+                });
+            } else {
+                newDetailList = [...oldDetailList, updateDetail];
+            }
+            //
+            // newDetail = updateField.detail.map((ele) => {
+            //     if (ele.status != 'not-submit') {
+            //         if (updateItem.closeTime < new Date(ele.submitTime)) {
+            //             return { ...ele, status: 'late' };
+            //         } else {
+            //             return { ...ele, status: 'on-time' };
+            //         }
+            //     }
+            //     return ele;
+            // });
+            updateField.detail = newDetailList;
         }
         const result = await assignmentModel.findByIdAndUpdate(
             req.params.id,

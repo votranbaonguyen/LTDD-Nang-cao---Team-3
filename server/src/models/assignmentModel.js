@@ -19,7 +19,6 @@ const assignmentSchema = new Schema({
     },
     detail: [
         {
-            _id: false,
             submitTime: {
                 type: Date,
                 default: new Date(),

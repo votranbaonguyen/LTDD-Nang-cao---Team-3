@@ -18,7 +18,8 @@ class ApiFeatures {
                 key in queryFields &&
                 typeof queryFields[key] === 'string' &&
                 isNaN(queryFields[key]) &&
-                !mongoose.Types.ObjectId.isValid(queryFields[key])
+                !mongoose.Types.ObjectId.isValid(queryFields[key]) &&
+                !['true', 'false'].includes(queryFields[key])
             ) {
                 queryFields[key] = {
                     $regex: new RegExp(queryFields[key], 'i'),
