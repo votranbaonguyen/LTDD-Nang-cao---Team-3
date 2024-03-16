@@ -40,6 +40,9 @@ const checkoutSchema = new Schema({
             studentAddress: {
                 type: String,
             },
+            time: {
+                type: String,
+            },
         },
     ],
 });

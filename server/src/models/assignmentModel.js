@@ -58,6 +58,9 @@ const assignmentSchema = new Schema({
 //     this.update({}, { $set: { detail: details } }); // Cập nhật lại trường 'detail'
 //     next();
 // });
+assignmentSchema.pre(/^find/, function () {
+    this.populate({ path: 'detail.student', select: '-password -role' });
+});
 
 const assignmentModel = model('Assignment', assignmentSchema);
 module.exports = {
