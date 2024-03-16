@@ -26,6 +26,7 @@ const uploadResource = async (req, res, next) => {
             data: {
                 filePath,
             },
+            fileName: req.file.originalname,
         });
     } catch (error) {
         console.log(error);

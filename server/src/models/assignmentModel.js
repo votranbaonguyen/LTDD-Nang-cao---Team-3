@@ -37,11 +37,9 @@ const assignmentSchema = new Schema({
             },
             submitText: {
                 type: String,
-                default: 'Here is my submit content',
             },
             submitUrl: {
                 type: String,
-                default: 'https://abc.com/image',
             },
         },
     ],

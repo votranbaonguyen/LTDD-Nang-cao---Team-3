@@ -44,6 +44,10 @@ const checkoutSchema = new Schema({
     ],
 });
 
+//
+checkoutSchema.pre(/^find/, function () {
+    this.populate([{ path: 'checkoutList.student' }]);
+});
 const checkoutModel = model('Checkout', checkoutSchema);
 
 module.exports = {
