@@ -1,11 +1,12 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
 import DocumentFile from './DocumentFile';
 import Assignment from './Assignment';
+import { useNavigation } from '@react-navigation/native';
 
-const ClassSection = ({ sectionData }) => {
-
+const ClassSection = ({ sectionData, classId }) => {
+    const navigate = useNavigation()
     const generateDocumentList = () => {
         if (sectionData)
             return sectionData.documentUrl.map((document, index) => {
@@ -16,7 +17,9 @@ const ClassSection = ({ sectionData }) => {
     const generateAssignmentList = () => {
         if (sectionData)
             return sectionData.assignment.map((assignment, index) => {
-                return <Assignment key={index} assignment={assignment} />
+                return <Pressable  key={index} onPress={() => navigate.navigate("AssignmentSubmit",{assignmentData: assignment, classId})}>
+                    <Assignment assignment={assignment} />
+                </Pressable>
             })
     }
 

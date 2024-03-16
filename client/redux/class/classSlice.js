@@ -28,9 +28,8 @@ export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classI
     }
 });
 
-export const getTodayClassList = createAsyncThunk('class/getTodayClassList', async () => {
+export const getTodayClassList = createAsyncThunk('class/getTodayClassList', async (userInfo) => {
     try {
-        const userInfo = await getUserInfo();
         let currentDate = new Date()
         let url = ''
         if(userInfo.role === 'teacher'){
@@ -51,10 +50,15 @@ export const getTodayClassList = createAsyncThunk('class/getTodayClassList', asy
     }
 });
 
-export const getAllClassByTeacherId = createAsyncThunk('class/getAllClassByTeacherId', async () =>{
+export const getAllClassById = createAsyncThunk('class/getAllClassById', async (userInfo) =>{
     try {
-        const userInfo = await getUserInfo();
-        let res = await axios.get(classAPI.getAllByTeacherId(userInfo._id), {
+        let url = ''
+        if(userInfo.role === 'teacher'){
+            url = classAPI.getAllByTeacherId(userInfo._id)
+        }else if(userInfo.role === 'student'){
+            url = classAPI.getAllByStudentId(userInfo._id)
+        }
+        let res = await axios.get(url, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
@@ -138,16 +142,16 @@ export const classSlice = createSlice({
             state.loading = false;
         });
 
-        builder.addCase(getAllClassByTeacherId.pending, (state, action) => {
+        builder.addCase(getAllClassById.pending, (state, action) => {
             state.loading = true;
         });
 
-        builder.addCase(getAllClassByTeacherId.fulfilled, (state, action) => {
+        builder.addCase(getAllClassById.fulfilled, (state, action) => {
             state.loading = false;
             state.allClassList = action.payload.data;
         });
 
-        builder.addCase(getAllClassByTeacherId.rejected, (state, action) => {
+        builder.addCase(getAllClassById.rejected, (state, action) => {
             state.loading = false;
         });
     },

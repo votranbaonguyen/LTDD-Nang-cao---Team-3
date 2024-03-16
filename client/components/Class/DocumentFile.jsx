@@ -6,9 +6,8 @@ import { Entypo } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 import { removeDocumentFile, removeNewDocumentFile } from '../../redux/class/classSlice';
 
-const DocumentFile = ({ documentUrl, editing, documentData, index, sectionId, removeFunc }) => {
+const DocumentFile = ({ documentUrl, editing, documentData, index, sectionId, removeFunc, noMargin }) => {
   const dispatch = useDispatch()
-
   const [fileName, setFileName] = useState('')
   const getFileNameAndType = async () => {
     try {
@@ -46,11 +45,11 @@ const DocumentFile = ({ documentUrl, editing, documentData, index, sectionId, re
 
   useEffect(() => {
     getFileNameAndType()
-  }, [documentUrl])
+  }, [documentUrl,documentData])
 
   return (
-    <Pressable style={styles.container} onPress={editing ? null : handleDownload}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+    <Pressable style={[styles.container, noMargin ? {marginHorizontal: 0} : {}]} onPress={editing ? null : handleDownload}>
+      <View style={{ flexDirection: "row", alignItems: "center", flex: 1}}>
         <FontAwesome5 name="file" size={24} color="#0A426E" />
 
         <Text style={styles.fileName}>{fileName}</Text>
@@ -63,7 +62,8 @@ const DocumentFile = ({ documentUrl, editing, documentData, index, sectionId, re
         }
 
       </View>
-      {editing ?
+      {
+       editing && !noMargin  ?
         <Pressable onPress={handleDeleteFile}>
           <Entypo
             name={'cross'}
@@ -73,7 +73,9 @@ const DocumentFile = ({ documentUrl, editing, documentData, index, sectionId, re
         </Pressable>
         :
         <></>
-      }
+      
+    }
+     
     </Pressable>
   )
 }
@@ -95,7 +97,8 @@ const styles = StyleSheet.create({
   fileName: {
     marginLeft: 10,
     fontSize: 15,
-    fontWeight: "bold"
+    fontWeight: "bold",
+    flex: 3
   },
   newTagContainer: {
     paddingHorizontal: 5,

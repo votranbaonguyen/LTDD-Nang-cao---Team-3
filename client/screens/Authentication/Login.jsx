@@ -75,15 +75,15 @@ const Login = () => {
                 navigate.navigate('Root', { screen: 'Home' });
                 ToastAndroid.show('Login success !', ToastAndroid.LONG);
 
-                const token = res.payload.accessToken;
+                const token = res.payload.token;
                 const userData = res.payload.user;
                 dispatch(updateUserInfoAfterLogin({
                     ...userData,
-                    accessToken: token,
+                    token: token,
                 }))
                 await saveUserInfo({
                     ...userData,
-                    accessToken: token,
+                    token: token,
                 });
             } else {
                 ToastAndroid.show(res.payload.message, ToastAndroid.LONG);

@@ -12,6 +12,8 @@ import ForgotPassword from './screens/Authentication/ForgotPassword';
 import OTPEnter from './screens/Authentication/OTPEnter';
 import Class from './screens/Class/Class';
 import ChangePassword from './screens/User/ChangePassword';
+import AssigmentSubmit from './screens/Class/AssigmentSubmit';
+import SubmittedWork from './screens/Class/SubmittedWork';
 
 const Stack = createStackNavigator();
 
@@ -63,6 +65,20 @@ export default function App() {
                         }}
                         name='Class'
                         component={Class}
+                    />
+                     <Stack.Screen
+                        options={{
+                            headerShown: false,
+                        }}
+                        name='AssignmentSubmit'
+                        component={AssigmentSubmit}
+                    />
+                      <Stack.Screen
+                        options={{
+                            headerShown: false,
+                        }}
+                        name='SubmittedWork'
+                        component={SubmittedWork}
                     />
                     <Stack.Screen
                         options={{

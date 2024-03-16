@@ -40,11 +40,38 @@ export const createAssignment = createAsyncThunk('assignment/createAssignment', 
     }
 });
 
+export const studentSubmitAssignment = createAsyncThunk('assignment/studentSubmitAssignment', async (data) => {
+  
+    try {
+        const userInfo = await getUserInfo();
+        let res = await axios.patch(assignmentAPI.updateOne(data.assignmentId), data.submitAssignmentData, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return error.response.data;
+    }
+});
+
 export const assignmentSlice = createSlice({
     name: 'assignment',
     initialState,
     extraReducers: (builder) => {
-    
+        builder.addCase(studentSubmitAssignment.pending, (state, action) => {
+            state.loading = true;
+        });
+
+        builder.addCase(studentSubmitAssignment.fulfilled, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(studentSubmitAssignment.rejected, (state, action) => {
+            state.loading = false;
+        });
     },
 });
 

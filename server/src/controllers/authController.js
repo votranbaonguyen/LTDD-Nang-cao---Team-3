@@ -57,7 +57,7 @@ const createAndSendToken = (user, statusCode, res) => {
     );
     res.status(statusCode).send({
         status: 'ok',
-        accessToken: jwtToken,
+        token: jwtToken,
         user: filterUser,
     });
 };
