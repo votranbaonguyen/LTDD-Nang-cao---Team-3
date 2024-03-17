@@ -25,17 +25,16 @@ const Home = () => {
     const [activeNav, setActiveNav] = useState('one');
 
     const handleCheckout = async () => {
-        const test = await getUserInfo();
-        if (test) console.log(test);
+        // const test = await getUserInfo();
+        // if (test) console.log(test);
+        navigate.navigate('Checkout');
     };
 
     const handleChangeTab = (type) => {
-        if(type === "one")
-            dispatch(getTodayClassList())
-        else if(type === "all")
-            dispatch(getAllClassByTeacherId())
-        setActiveNav(type)
-    }
+        if (type === 'one') dispatch(getTodayClassList());
+        else if (type === 'all') dispatch(getAllClassByTeacherId());
+        setActiveNav(type);
+    };
 
     const renderClassList = () => {
         if (activeNav === 'one') {

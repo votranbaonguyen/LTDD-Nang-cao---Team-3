@@ -9,7 +9,7 @@ const initialState = {
     todayClassList: [],
     allClassList: [],
     uploadDocumentsList: [],
-    newAssignmentList: []
+    newAssignmentList: [],
 };
 
 export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classId) => {
@@ -23,7 +23,7 @@ export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classI
         });
         return res.data;
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data.message);
         return error.response.data;
     }
 });
@@ -31,12 +31,12 @@ export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classI
 export const getTodayClassList = createAsyncThunk('class/getTodayClassList', async () => {
     try {
         const userInfo = await getUserInfo();
-        let currentDate = new Date()
-        let url = ''
-        if(userInfo.role === 'teacher'){
-            url = classAPI.getAllTeacherClassByDate(currentDate.getDay() - 1,userInfo._id)
-        }else if(userInfo.role === 'student'){
-            url = classAPI.getAllStudentClassByDate(currentDate.getDay() - 1,userInfo._id)
+        let currentDate = new Date();
+        let url = '';
+        if (userInfo.role === 'teacher') {
+            url = classAPI.getAllTeacherClassByDate(currentDate.getDay(), userInfo._id);
+        } else if (userInfo.role === 'student') {
+            url = classAPI.getAllStudentClassByDate(currentDate.getDay(), userInfo._id);
         }
         let res = await axios.get(url, {
             headers: {
@@ -51,7 +51,7 @@ export const getTodayClassList = createAsyncThunk('class/getTodayClassList', asy
     }
 });
 
-export const getAllClassByTeacherId = createAsyncThunk('class/getAllClassByTeacherId', async () =>{
+export const getAllClassByTeacherId = createAsyncThunk('class/getAllClassByTeacherId', async () => {
     try {
         const userInfo = await getUserInfo();
         let res = await axios.get(classAPI.getAllByTeacherId(userInfo._id), {
@@ -65,49 +65,56 @@ export const getAllClassByTeacherId = createAsyncThunk('class/getAllClassByTeach
         console.log(error);
         return error.response.data;
     }
-})
+});
 
-export const updateOneSection = createAsyncThunk('class/updateOneSection', async ({classId,data}) =>{
-    try {
-        const userInfo = await getUserInfo();
-        let res = await axios.patch(classAPI.updateOneSection(classId), data, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`,
-            },
-        });
-        return res.data;
-    } catch (error) {
-        console.log(error);
-        return error.response.data;
+export const updateOneSection = createAsyncThunk(
+    'class/updateOneSection',
+    async ({ classId, data }) => {
+        try {
+            const userInfo = await getUserInfo();
+            let res = await axios.patch(classAPI.updateOneSection(classId), data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
     }
-})
+);
 
-export const createOneSection = createAsyncThunk('class/createOneSection', async ({classId,data}) =>{
-    try {
-        const userInfo = await getUserInfo();
-        let res = await axios.patch(classAPI.updateOneSection(classId), data, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${userInfo.token}`,
-            },
-        });
-        return res.data;
-    } catch (error) {
-        console.log(error);
-        return error.response.data;
+export const createOneSection = createAsyncThunk(
+    'class/createOneSection',
+    async ({ classId, data }) => {
+        try {
+            const userInfo = await getUserInfo();
+            let res = await axios.patch(classAPI.updateOneSection(classId), data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
     }
-})
-
+);
 
 export const classSlice = createSlice({
     name: 'class',
     initialState,
     reducers: {
-        removeDocumentFile: (state,action) => {
-            const index = state.classInfo.section.findIndex((section) => section._id === action.payload.sectionId)
-            if(index !== -1) {
-                state.classInfo.section[index].documentUrl.splice(action.payload.documentIndex,1)
+        removeDocumentFile: (state, action) => {
+            const index = state.classInfo.section.findIndex(
+                (section) => section._id === action.payload.sectionId
+            );
+            if (index !== -1) {
+                state.classInfo.section[index].documentUrl.splice(action.payload.documentIndex, 1);
             }
         },
     },
@@ -154,6 +161,6 @@ export const classSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {removeDocumentFile} = classSlice.actions;
+export const { removeDocumentFile } = classSlice.actions;
 
 export default classSlice.reducer;

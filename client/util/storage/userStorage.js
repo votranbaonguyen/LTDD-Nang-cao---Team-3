@@ -10,7 +10,6 @@ const saveUserInfo = async (user) => {
             role: user.role,
         });
         await AsyncStorage.setItem('user', data);
-        console.log('write ok');
     } catch (error) {
         console.error('Lỗi khi lưu trữ dữ liệu:', error);
     }
@@ -20,7 +19,7 @@ const getUserInfo = async () => {
     try {
         const value = await AsyncStorage.getItem('user');
         if (value !== null) {
-            console.log('Dữ liệu đã được lấy:', value);
+            // console.log('Dữ liệu đã được lấy:', value);
             return JSON.parse(value);
         } else {
             console.log('no user data');
@@ -35,7 +34,6 @@ const getUserInfo = async () => {
 const deleteUserInfo = async () => {
     try {
         await AsyncStorage.removeItem('user');
-        console.log('delete ok');
     } catch (error) {
         console.error('Lỗi khi xóa dữ liệu:', error);
     }

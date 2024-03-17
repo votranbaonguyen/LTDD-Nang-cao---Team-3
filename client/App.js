@@ -12,6 +12,7 @@ import ForgotPassword from './screens/Authentication/ForgotPassword';
 import OTPEnter from './screens/Authentication/OTPEnter';
 import Class from './screens/Class/Class';
 import ChangePassword from './screens/User/ChangePassword';
+import CheckOut from './screens/CheckOut/CheckOut';
 
 const Stack = createStackNavigator();
 
@@ -70,6 +71,13 @@ export default function App() {
                         }}
                         name='ChangePassword'
                         component={ChangePassword}
+                    />
+                    <Stack.Screen
+                        options={{
+                            headerShown: false,
+                        }}
+                        name='Checkout'
+                        component={CheckOut}
                     />
                 </Stack.Navigator>
             </NavigationContainer>
