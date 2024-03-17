@@ -17,6 +17,7 @@ const Class = ({ navigation, route }) => {
     const [creating, setCreating] = useState(false);
     const { classInfo, loading } = useSelector((store) => store.classSlice);
     const [createEditLoading, setCreateEditLoading] = useState(false)
+    const { userInfo } = useSelector((store) => store.userSlice);
     const generateSectionDropdown = () => {
         if (classInfo)
             return classInfo.section.map((section) => {
@@ -91,28 +92,32 @@ const Class = ({ navigation, route }) => {
                         :
                         editing ?
                             <EditSection sectionData={getSectionData()} cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} /> :
-                            <ClassSection sectionData={getSectionData()} />
+                            <ClassSection sectionData={getSectionData()} classId={route.params.classId}/>
+                }
+                {
+                    userInfo.role === "teacher" &&
+                    (
+                        <View style={styles.buttonContainer}>
+                            {
+                                editing || creating ?
+                                    <>
+
+                                    </>
+                                    :
+                                    <View style={styles.buttonContainer}>
+                                        <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
+                                            <Text style={styles.secondButtonText}>CREATE</Text>
+                                        </Pressable>
+                                        <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
+                                            <Text style={styles.mainButtonText}>EDIT</Text>
+                                        </Pressable>
+                                    </View>
+                            }
+
+                        </View>
+                    )
                 }
 
-                <View style={styles.buttonContainer}>
-                    {
-                        editing || creating ?
-                            <>
-
-                            </>
-
-                            :
-                            <View style={styles.buttonContainer}>
-                                <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
-                                    <Text style={styles.secondButtonText}>CREATE</Text>
-                                </Pressable>
-                                <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
-                                    <Text style={styles.mainButtonText}>EDIT</Text>
-                                </Pressable>
-                            </View>
-                    }
-
-                </View>
 
             </View>
 

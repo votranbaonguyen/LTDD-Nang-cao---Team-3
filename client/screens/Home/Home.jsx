@@ -6,14 +6,14 @@ import { BSON } from 'realm';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllClassByTeacherId, getTodayClassList } from '../../redux/class/classSlice';
+import { getAllClassById, getTodayClassList } from '../../redux/class/classSlice';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 
 // const fake = {
 //     _id: BSON.ObjectID('65d6ed58b07757a158cfeca0'),
 //     name: 'thoty',
 //     email: 'thoty@gmail.com',
-//     accessToken: 'abcdef',
+//     token: 'abcdef',
 // };
 
 const Home = () => {
@@ -25,14 +25,12 @@ const Home = () => {
     const [activeNav, setActiveNav] = useState('one');
 
     const handleCheckout = async () => {
-        // const test = await getUserInfo();
-        // if (test) console.log(test);
-        navigate.navigate('Checkout');
+        const test = await getUserInfo();
     };
 
     const handleChangeTab = (type) => {
-        if (type === 'one') dispatch(getTodayClassList());
-        else if (type === 'all') dispatch(getAllClassByTeacherId());
+        if (type === 'one') dispatch(getTodayClassList(userInfo));
+        else if (type === 'all') dispatch(getAllClassById(userInfo));
         setActiveNav(type);
     };
 
@@ -85,9 +83,11 @@ const Home = () => {
     };
 
     useEffect(() => {
-        dispatch(getTodayClassList());
-        dispatch(getAllClassByTeacherId());
-    }, []);
+        if (userInfo) {
+            dispatch(getTodayClassList(userInfo));
+            dispatch(getAllClassById(userInfo));
+        }
+    }, [userInfo]);
 
     return (
         <View style={styles.container}>

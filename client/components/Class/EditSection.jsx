@@ -151,8 +151,13 @@ const EditSection = ({ sectionData, cancel, classId, startLoading, stopLoading }
     }
 
     const handleUploadFile = async () => {
-        const file = await DocumentPicker.getDocumentAsync()
-        addDocumentFile(file.assets[0])
+        try {
+            const file = await DocumentPicker.getDocumentAsync()
+            addDocumentFile(file.assets[0])
+        } catch (error) {
+            
+        }
+      
 
     }
 

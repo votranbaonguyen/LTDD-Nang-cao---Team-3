@@ -6,7 +6,7 @@ const saveUserInfo = async (user) => {
             _id: user._id,
             name: user.name,
             email: user.email,
-            token: user.accessToken,
+            token: user.token,
             role: user.role,
         });
         await AsyncStorage.setItem('user', data);
