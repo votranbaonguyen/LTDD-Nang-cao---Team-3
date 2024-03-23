@@ -98,7 +98,7 @@ export default function Section({ time, name, teacher, room, isChecked, classId,
 const styles = StyleSheet.create({
     container: {
         display: 'flex',
-        marginTop: 20,
+        marginBottom: 15,
         paddingHorizontal: 10,
     },
     container2: {

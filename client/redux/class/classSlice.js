@@ -30,13 +30,34 @@ export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classI
 
 export const getTodayClassList = createAsyncThunk('class/getTodayClassList', async (userInfo) => {
     try {
-        const userInfo = await getUserInfo();
         let currentDate = new Date();
         let url = '';
         if (userInfo.role === 'teacher') {
             url = classAPI.getAllTeacherClassByDate(currentDate.getDay(), userInfo._id);
         } else if (userInfo.role === 'student') {
             url = classAPI.getAllStudentClassByDate(currentDate.getDay(), userInfo._id);
+        }
+        let res = await axios.get(url, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        });
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return error.response.data;
+    }
+});
+
+export const getClassListByDate = createAsyncThunk('class/getClassListByDate', async (data) => {
+    const {userInfo,date} = data
+    try {
+        let url = '';
+        if (userInfo.role === 'teacher') {
+            url = classAPI.getAllTeacherClassByDate(date.getDay(), userInfo._id);
+        } else if (userInfo.role === 'student') {
+            url = classAPI.getAllStudentClassByDate(date.getDay(), userInfo._id);
         }
         let res = await axios.get(url, {
             headers: {

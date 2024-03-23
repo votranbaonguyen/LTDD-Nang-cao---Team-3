@@ -95,6 +95,7 @@ export default function App() {
                         name='Checkout'
                         component={CheckOut}
                     />
+                    
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

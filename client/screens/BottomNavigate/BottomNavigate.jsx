@@ -3,6 +3,7 @@ import Home from '../Home/Home';
 import { Text } from 'react-native';
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 import User from '../User/User';
+import WeekCalendar from '../WeekCalendar/WeekCalendar';
 
 const Tab = createBottomTabNavigator();
 
@@ -24,7 +25,7 @@ const BottomNavigate = () => {
             />
             <Tab.Screen
                 name='Calendar'
-                component={Home}
+                component={WeekCalendar}
                 options={{
                     headerShown: false,
                     tabBarIcon: ({ color, size }) => (
