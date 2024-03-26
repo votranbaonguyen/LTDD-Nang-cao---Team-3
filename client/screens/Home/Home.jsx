@@ -1,20 +1,13 @@
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Section from './Section';
-import { deleteUserInfo, getUserInfo } from '../../util/storage/userStorage';
-import { BSON } from 'realm';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllClassById, getTodayClassList } from '../../redux/class/classSlice';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 
-// const fake = {
-//     _id: BSON.ObjectID('65d6ed58b07757a158cfeca0'),
-//     name: 'thoty',
-//     email: 'thoty@gmail.com',
-//     token: 'abcdef',
-// };
+import * as Location from 'expo-location';
 
 const Home = () => {
     const navigate = useNavigation();
@@ -22,10 +15,14 @@ const Home = () => {
     const { userInfo, loading } = useSelector((store) => store.userSlice);
     const { todayClassList, allClassList } = useSelector((store) => store.classSlice);
 
+    const [location, setLocation] = useState(null);
+    const [errorMsg, setErrorMsg] = useState(null);
+
     const [activeNav, setActiveNav] = useState('one');
 
-    const handleCheckout = async () => {
-        const test = await getUserInfo();
+    const handleCheckout = () => {
+        // const test = await getUserInfo();
+        navigate.navigate('Checkout');
     };
 
     const handleChangeTab = (type) => {
@@ -33,6 +30,20 @@ const Home = () => {
         else if (type === 'all') dispatch(getAllClassById(userInfo));
         setActiveNav(type);
     };
+
+    //
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                setErrorMsg('Permission to access location was denied');
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+        })();
+    }, []);
 
     const renderClassList = () => {
         if (activeNav === 'one') {

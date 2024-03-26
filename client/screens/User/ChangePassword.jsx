@@ -3,46 +3,46 @@ import React, { useState } from 'react';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 import { useDispatch, useSelector } from 'react-redux';
 import { validateError } from '../../util/validation/validateError';
-import { resetPassword } from '../../redux/authentication/authenticationSlice';
+import { changePassword, resetPassword } from '../../redux/authentication/authenticationSlice';
 import { StackActions, useNavigation } from '@react-navigation/native';
 
 export default function ChangePassword() {
     const navigate = useNavigation();
     const dispatch = useDispatch();
     const { loading, changePasswordData } = useSelector((store) => store.authenticationSlice);
-    const [otp, setOtp] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState({
-        password: '',
-    });
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [repeatPass, setRepeatPass] = useState('');
 
-    const validation = () => {
-        let tempError = {
-            password: '',
-        };
-        if (password.length === 0) tempError.password = validateError.notEnterPassword;
-        if (password.length >= 1 && password.length < 8)
-            tempError.password = validateError.tooShortPassword;
-        setError(tempError);
-        return tempError.password;
-    };
+    // const validation = (password) => {
+
+    //     let tempError = {
+    //         password: '',
+    //     };
+    //     if (password.length === 0) tempError.password = validateError.notEnterPassword;
+    //     if (password.length >= 1 && password.length < 8)
+    //         tempError.password = validateError.tooShortPassword;
+    //     setError(tempError);
+    //     return tempError.password;
+    // };
     const handleSubmit = async () => {
-        let validate = validation();
-        if (validate.length === 0) {
-            const data = {
-                userId: changePasswordData.userId,
-                newPassword: password,
-                resetToken: otp,
-            };
-            const res = await dispatch(resetPassword(data));
-            if (res.payload.status === 'ok') {
-                navigate.dispatch(StackActions.replace('Login'));
-                ToastAndroid.show('Reset Password Success !', ToastAndroid.LONG);
-            } else {
-                ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
-            }
+        if (repeatPass !== newPassword) {
+            ToastAndroid.show('Your password and retype password not match!', ToastAndroid.LONG);
+            return;
+        }
+        const data = {
+            oldPassword,
+            newPassword,
+        };
+        const res = await dispatch(changePassword(data));
+        if (res.payload.status === 'ok') {
+            navigate.dispatch(StackActions.replace('Login'));
+            ToastAndroid.show(
+                'Change password successfully, please login again !',
+                ToastAndroid.LONG
+            );
         } else {
-            ToastAndroid.show(validate, ToastAndroid.LONG);
+            ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
         }
     };
     return (
@@ -52,17 +52,20 @@ export default function ChangePassword() {
             <TextInput
                 placeholder='Enter your old password'
                 style={styles.input}
-                onChangeText={(text) => setOtp(text)}
+                value={oldPassword}
+                onChangeText={(text) => setOldPassword(text)}
             />
             <TextInput
                 placeholder='Enter your new Password'
                 style={styles.input}
-                onChangeText={(text) => setPassword(text)}
+                value={newPassword}
+                onChangeText={(text) => setNewPassword(text)}
             />
             <TextInput
                 placeholder='Confirm your new Password'
                 style={styles.input}
-                onChangeText={(text) => setPassword(text)}
+                value={repeatPass}
+                onChangeText={(text) => setRepeatPass(text)}
             />
             <View style={{ display: 'flex', flexDirection: 'row-reverse', gap: 10 }}>
                 <Pressable style={[styles.button, { flexGrow: 1 }]} onPress={handleSubmit}>
@@ -84,7 +87,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 20,
         flex: 1,
-        marginTop: 70,
+        marginTop: 20,
     },
     input: {
         borderWidth: 2,

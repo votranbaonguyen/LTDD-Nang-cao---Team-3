@@ -1,6 +1,6 @@
 import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, ToastAndroid, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getClassInfo } from '../../redux/class/classSlice';
 import {
@@ -10,6 +10,9 @@ import {
 } from '../../redux/checkout/checkoutSlice';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 import { getUserInfo } from '../../util/storage/userStorage';
+import CheckOutStatistic from './CheckOutStatistic';
+import * as Location from 'expo-location';
+import { calculateDistance } from '../../util/helper/location';
 
 export default function CheckOut() {
     const dispatch = useDispatch();
@@ -20,19 +23,13 @@ export default function CheckOut() {
     } = useSelector((store) => store.classSlice);
     const [user, setUser] = useState(null);
     let loadingUser = false;
-    const {
-        loading: loadingCheckout,
-        checkoutInfo,
-        isProcessing,
-    } = useSelector((store) => store.checkoutSlice);
+    const { loading: loadingCheckout, checkoutInfo } = useSelector((store) => store.checkoutSlice);
 
     const [selectClassId, setSelectClassId] = useState(null);
     const [isCheck, setIsCheck] = useState(false);
 
-    console.log(isCheck);
-
     const renderCheckoutButton = () => {
-        if (isProcessing && user?.role === 'teacher')
+        if (checkoutInfo?.status === 'processing' && user?.role === 'teacher')
             return (
                 <Pressable
                     onPress={handleCloseCheckout}
@@ -42,7 +39,17 @@ export default function CheckOut() {
                     <Text style={styles.mainButtonText}>STOP CHECKOUT</Text>
                 </Pressable>
             );
-        else if (!isProcessing && user?.role === 'teacher')
+        else if (checkoutInfo?.status === 'finish' && user?.role === 'teacher')
+            return (
+                <Pressable
+                    onPress={handleOpenCheckout}
+                    disabled={loadingClass || loadingCheckout || loadingUser}
+                    style={[styles.button, styles.mainButton, { backgroundColor: 'gray' }]}
+                >
+                    <Text style={styles.mainButtonText}>CHECKOUT FINISHED</Text>
+                </Pressable>
+            );
+        else if (user?.role === 'teacher')
             return (
                 <Pressable
                     onPress={handleOpenCheckout}
@@ -52,7 +59,11 @@ export default function CheckOut() {
                     <Text style={styles.mainButtonText}>START CHECKOUT</Text>
                 </Pressable>
             );
-        else if (isProcessing && user?.role === 'student' && isCheck === false)
+        else if (
+            checkoutInfo?.status === 'processing' &&
+            user?.role === 'student' &&
+            isCheck === false
+        )
             return (
                 <Pressable
                     onPress={() => handleCheckout(user._id)}
@@ -62,7 +73,11 @@ export default function CheckOut() {
                     <Text style={styles.mainButtonText}>CHECKOUT NOW</Text>
                 </Pressable>
             );
-        else if (isProcessing && user?.role === 'student' && isCheck === true)
+        else if (
+            checkoutInfo?.status === 'processing' &&
+            user?.role === 'student' &&
+            isCheck === true
+        )
             return (
                 <Pressable
                     onPress={() => handleCheckout(user._id)}
@@ -83,7 +98,28 @@ export default function CheckOut() {
             );
     };
 
-    const handleOpenCheckout = () => {
+    const getMyLocation = async () => {
+        try {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                ToastAndroid.show(
+                    'You need grant location permission to perform this action',
+                    ToastAndroid.LONG
+                );
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            return {
+                lat: location.coords.latitude,
+                lng: location.coords.longitude,
+            };
+        } catch (error) {
+            ToastAndroid.show('There was an error when get location, try again', ToastAndroid.LONG);
+        }
+    };
+
+    const handleOpenCheckout = async () => {
         const minute = new Date().getMinutes();
         const start = `${new Date().getHours()}:${minute < 10 ? '0' + minute.toString() : minute}`;
         const checkoutList = classInfo.member.map((ele) => {
@@ -93,12 +129,17 @@ export default function CheckOut() {
                 studentAddress: 'Not found',
             };
         });
+
+        const myLocation = await getMyLocation();
+
         const tempCheckout = {
             checkoutList: checkoutList,
             startTime: start,
             endTime: 'on-going',
             day: new Date(),
             class: classInfo._id,
+            teacherAddress: myLocation,
+            status: 'processing',
         };
         dispatch(createCheckout(tempCheckout));
     };
@@ -110,27 +151,45 @@ export default function CheckOut() {
         dispatch(
             updateCheckout({
                 checkoutId: checkoutInfo._id,
-                data: { endTime: end, isProcessing: false },
+                data: { endTime: end, status: 'finish' },
             })
         );
     };
-    const handleCheckout = (studentId) => {
-        const minute = new Date().getMinutes();
-        const time = `${new Date().getHours()}:${minute < 10 ? '0' + minute.toString() : minute}`;
-        const isOntime =
-            checkoutInfo.endTime.split(':')[0] > new Date().getHours() ? 'on-time' : 'late';
-        const checkItem = {
-            time: time,
-            student: studentId,
-            status: isOntime,
-        };
-        const newCheckList = checkoutInfo.checkoutList.map((ele) => {
-            if (studentId === ele.student._id.toString()) return checkItem;
-            return ele;
-        });
-        dispatch(
-            updateCheckout({ checkoutId: checkoutInfo._id, data: { checkoutList: newCheckList } })
-        );
+    const handleCheckout = async (studentId) => {
+        try {
+            const minute = new Date().getMinutes();
+            const time = `${new Date().getHours()}:${
+                minute < 10 ? '0' + minute.toString() : minute
+            }`;
+            const isOntime = checkoutInfo.status === 'processing' ? 'on-time' : 'late';
+            const myAddress = await getMyLocation();
+            const { teacherAddress } = checkoutInfo;
+            const isTooFar =
+                calculateDistance(
+                    myAddress.lat,
+                    myAddress.lng,
+                    teacherAddress.lat,
+                    teacherAddress.lng
+                ) < 150; //must be smaller 150 meters
+            const checkItem = {
+                time: time,
+                student: studentId,
+                status: isTooFar ? 'too-far' : isOntime ? 'on-time' : 'late',
+            };
+            const newCheckList = checkoutInfo.checkoutList.map((ele) => {
+                if (studentId === ele.student._id.toString()) return checkItem;
+                return ele;
+            });
+            dispatch(
+                updateCheckout({
+                    checkoutId: checkoutInfo._id,
+                    data: { checkoutList: newCheckList },
+                })
+            );
+        } catch (error) {
+            ToastAndroid.show('There was an error when checkout, try again', ToastAndroid.LONG);
+            console.log(error);
+        }
     };
 
     const onPickerChange = (value, i) => {
@@ -151,6 +210,7 @@ export default function CheckOut() {
             });
     };
 
+    // load user info
     useEffect(function () {
         const getUser = async () => {
             loadingUser = true;
@@ -161,6 +221,7 @@ export default function CheckOut() {
         getUser();
     }, []);
 
+    // load check info when change item in dropdown
     useEffect(
         function () {
             if (selectClassId) dispatch(getCheckoutByClass(selectClassId));
@@ -168,6 +229,7 @@ export default function CheckOut() {
         [selectClassId]
     );
 
+    // load class info base on current item of dropdown
     useEffect(function () {
         if (todayClassList) {
             const classId = todayClassList[0]?._id || '';
@@ -187,12 +249,10 @@ export default function CheckOut() {
     );
 
     return (
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, marginTop: 0 }}>
             <LoadingIndicator loading={loadingClass || loadingCheckout} />
             <View style={{ paddingHorizontal: 20 }}>
-                <Text
-                    style={{ marginTop: 100, marginBottom: 10, fontWeight: 'bold', fontSize: 15 }}
-                >
+                <Text style={{ marginTop: 10, marginBottom: 10, fontWeight: 'bold', fontSize: 15 }}>
                     Choose your class
                 </Text>
 
@@ -247,66 +307,9 @@ export default function CheckOut() {
                 </Text>
             </View>
 
-            {isProcessing ? (
-                <View style={{ flex: 1, marginTop: 20 }}>
-                    <Text style={{ fontWeight: 'bold', paddingLeft: 20 }}>Checkout Statistic</Text>
-
-                    <View
-                        style={{
-                            marginTop: 10,
-                            backgroundColor: 'white',
-                            borderRadius: 5,
-                            elevation: 5,
-                            padding: 10,
-                            marginHorizontal: 20,
-                        }}
-                    >
-                        <Text style={styles.classInfo}>
-                            Checkout start time:{' '}
-                            <Text style={styles.classInfoContent}>{checkoutInfo.startTime}</Text>
-                        </Text>
-                        <Text style={styles.classInfo}>
-                            Checkout end time:{' '}
-                            <Text style={styles.classInfoContent}>
-                                {checkoutInfo.endTime.includes(':')
-                                    ? checkoutInfo.endTime
-                                    : 'On going'}
-                            </Text>
-                        </Text>
-                    </View>
-
-                    <ScrollView
-                        style={{
-                            marginTop: 10,
-                            backgroundColor: 'white',
-                            borderRadius: 5,
-                            elevation: 5,
-                            padding: 10,
-                            marginHorizontal: 20,
-                            flex: 1,
-                            maxHeight: 200,
-                        }}
-                    >
-                        {checkoutInfo.checkoutList.map((ele) => {
-                            return (
-                                <View
-                                    key={Math.random()}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        flexDirection: 'row',
-                                        marginBottom: 10,
-                                    }}
-                                >
-                                    <Text>{ele?.time ? ele.time : '----'}</Text>
-                                    <Text style={{ fontWeight: '600' }}>{ele.student.name}</Text>
-                                    <Text>{ele.status}</Text>
-                                </View>
-                            );
-                        })}
-                    </ScrollView>
-                </View>
+            {checkoutInfo?.status === 'processing' ||
+            (checkoutInfo?.status === 'finish' && user?.role === 'teacher') ? (
+                <CheckOutStatistic checkoutInfo={checkoutInfo} />
             ) : (
                 ''
             )}
@@ -320,7 +323,7 @@ const styles = StyleSheet.create({
     classInfo: {
         fontWeight: '900',
         color: '#0A426E',
-        lineHeight: 33,
+        lineHeight: 25,
         paddingLeft: 7,
     },
     classInfoContent: {

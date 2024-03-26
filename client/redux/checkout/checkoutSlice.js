@@ -6,7 +6,6 @@ import { getUserInfo } from '../../util/storage/userStorage';
 const initialState = {
     loading: false,
     checkoutInfo: {},
-    isProcessing: false,
 };
 
 export const createCheckout = createAsyncThunk('checkout/create', async (data) => {
@@ -72,7 +71,6 @@ export const checkoutSlice = createSlice({
         builder.addCase(createCheckout.fulfilled, (state, action) => {
             state.loading = false;
             state.checkoutInfo = action.payload.data;
-            state.isProcessing = true;
         });
 
         builder.addCase(createCheckout.rejected, (state, action) => {
@@ -86,7 +84,6 @@ export const checkoutSlice = createSlice({
         builder.addCase(getCheckoutByClass.fulfilled, (state, action) => {
             state.loading = false;
             state.checkoutInfo = action.payload.total > 0 ? action.payload.data[0] : {};
-            state.isProcessing = action.payload.total > 0 ? true : false;
         });
 
         builder.addCase(getCheckoutByClass.rejected, (state, action) => {
@@ -100,7 +97,6 @@ export const checkoutSlice = createSlice({
         builder.addCase(updateCheckout.fulfilled, (state, action) => {
             state.loading = false;
             state.checkoutInfo = action.payload.data;
-            state.isProcessing = action.payload.data.isProcessing;
         });
 
         builder.addCase(updateCheckout.rejected, (state, action) => {

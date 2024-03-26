@@ -83,19 +83,18 @@ export default function App() {
                     />
                     <Stack.Screen
                         options={{
-                            headerShown: false,
+                            headerShown: true,
                         }}
                         name='ChangePassword'
                         component={ChangePassword}
                     />
                     <Stack.Screen
                         options={{
-                            headerShown: false,
+                            headerShown: true,
                         }}
                         name='Checkout'
                         component={CheckOut}
                     />
-                    
                 </Stack.Navigator>
             </NavigationContainer>
         </Provider>

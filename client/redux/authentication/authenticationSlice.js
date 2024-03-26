@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { authenticationAPI } from './api';
 import axios from 'axios';
+import { getUserInfo } from '../../util/storage/userStorage';
 
 const initialState = {
     loading: false,
@@ -10,27 +11,23 @@ const initialState = {
     },
 };
 
-export const changePassword = createAsyncThunk(
-    'authentication/changepassword',
-    async ({ oldPassword, newPassword }) => {
-        try {
-            let res = await axios.post(
-                authenticationAPI.changePassword,
-                { oldPassword, newPassword },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
+export const changePassword = createAsyncThunk('authentication/changepassword', async (data) => {
+    try {
+        const userInfo = await getUserInfo();
 
-            return res.data;
-        } catch (error) {
-            console.log(error);
-            return error.response.data;
-        }
+        let res = await axios.post(authenticationAPI.changePassword, data, {
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            },
+        });
+
+        return res.data;
+    } catch (error) {
+        console.log(error);
+        return error.response.data;
     }
-);
+});
 
 export const register = createAsyncThunk('authentication/register', async (registerData) => {
     try {
@@ -76,10 +73,8 @@ export const forgotPassword = createAsyncThunk('authentication/forgotPassword', 
     }
 });
 
-  export const resetPassword = createAsyncThunk(
-    "authentication/resetPassword",
-    async (data) => {
-      try {
+export const resetPassword = createAsyncThunk('authentication/resetPassword', async (data) => {
+    try {
         let newData = {
             newPassword: data.newPassword,
             resetToken: data.resetToken,
@@ -159,6 +154,7 @@ export const authenticationSlice = createSlice({
             state.loading = false;
         });
 
+        //
         builder.addCase(changePassword.pending, (state, action) => {
             state.loading = true;
         });

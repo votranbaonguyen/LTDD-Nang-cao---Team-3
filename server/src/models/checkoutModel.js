@@ -5,9 +5,13 @@ const checkoutSchema = new Schema({
         type: Schema.ObjectId,
         ref: 'Class',
     },
-    isProcessing: {
-        type: Boolean,
-        default: true,
+    status: {
+        type: String,
+        enum: {
+            values: ['not-yet', 'processing', 'finish'],
+            message: 'Invalid status of checkout',
+        },
+        default: 'student',
     },
     day: {
         type: Date,
@@ -20,7 +24,7 @@ const checkoutSchema = new Schema({
         type: String,
     },
     teacherAddress: {
-        type: String,
+        type: Object,
     },
     checkoutList: [
         {
@@ -32,13 +36,13 @@ const checkoutSchema = new Schema({
             status: {
                 type: String,
                 enum: {
-                    values: ['on-time', 'late', 'too far', 'non-check'],
+                    values: ['on-time', 'late', 'too-far', 'non-check'],
                     message: "value are only: 'on-time', 'late', 'too far'",
                 },
                 default: 'non-check',
             },
             studentAddress: {
-                type: String,
+                type: Object,
             },
             time: {
                 type: String,
