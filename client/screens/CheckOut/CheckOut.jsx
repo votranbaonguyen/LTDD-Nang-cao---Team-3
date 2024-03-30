@@ -170,7 +170,7 @@ export default function CheckOut() {
                     myAddress.lng,
                     teacherAddress.lat,
                     teacherAddress.lng
-                ) < 150; //must be smaller 150 meters
+                ) > 150; //must be smaller 150 meters
             const checkItem = {
                 time: time,
                 student: studentId,

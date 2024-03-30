@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { validateError } from '../../util/validation/validateError';
 import { changePassword, resetPassword } from '../../redux/authentication/authenticationSlice';
 import { StackActions, useNavigation } from '@react-navigation/native';
+import { deleteUserInfo } from '../../util/storage/userStorage';
 
 export default function ChangePassword() {
     const navigate = useNavigation();
@@ -34,8 +35,10 @@ export default function ChangePassword() {
             oldPassword,
             newPassword,
         };
+
         const res = await dispatch(changePassword(data));
         if (res.payload.status === 'ok') {
+            deleteUserInfo();
             navigate.dispatch(StackActions.replace('Login'));
             ToastAndroid.show(
                 'Change password successfully, please login again !',

@@ -15,15 +15,15 @@ export const changePassword = createAsyncThunk('authentication/changepassword', 
     try {
         const userInfo = await getUserInfo();
 
-        let res = await axios.post(authenticationAPI.changePassword, data, {
+        let res = await axios.patch(authenticationAPI.changePassword(), data, {
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
             },
         });
-
         return res.data;
     } catch (error) {
+        console.log(123);
         console.log(error);
         return error.response.data;
     }
@@ -39,7 +39,7 @@ export const register = createAsyncThunk('authentication/register', async (regis
 
         return res.data;
     } catch (error) {
-        console.log(error);
+        console.log(error.response.data);
         return error.response.data;
     }
 });

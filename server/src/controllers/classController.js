@@ -1,14 +1,7 @@
 const { classModel } = require('../models/classModel');
 const { ApiFeatures } = require('../utils/ApiFeature');
 const { CustomError } = require('../utils/CustomError');
-const {
-    createOne,
-    updateOne,
-    deleteOne,
-    getAll,
-    getOne,
-    updateMany,
-} = require('./crudController');
+const { createOne, deleteOne, getAll, getOne, updateMany } = require('./crudController');
 
 const createClass = createOne(classModel);
 // const updateClass = updateOne(classModel);
@@ -78,6 +71,54 @@ const getClassByStudentId = async (req, res, next) => {
     }
 };
 
+const getAssignmentStatis = async (req, res, next) => {
+    try {
+        const checkClass = await classModel
+            .findById(req.params.id)
+            .populate([{ path: 'member' }])
+            .lean();
+        if (!checkClass) return next(new CustomError('No document with this id', 404));
+        let studentList = checkClass.member.map((mem) => {
+            return { _id: mem._id, name: mem.name, assignment: [] };
+        });
+        let totalAssignment = 0;
+        checkClass.section.forEach((sec) => {
+            sec.assignment.forEach((assign) => {
+                totalAssignment++;
+                assign.detail.forEach((submit) => {
+                    studentList.forEach((student) => {
+                        if (student._id.toString() === submit.student._id.toString())
+                            student.assignment = [...student.assignment, submit];
+                    });
+                });
+            });
+        });
+
+        studentList = studentList.map((student) => {
+            const count = {
+                late: 0,
+                'on-time': 0,
+                'not-submit': 0,
+                total: totalAssignment,
+            };
+            student.assignment.forEach((assign) => {
+                count[assign.status]++;
+            });
+            count['not-submit'] = totalAssignment - count.late - count['on-time'];
+            return { ...student, count: count };
+        });
+
+        res.status(200).send({
+            status: 'ok',
+            studentList,
+            checkClass,
+        });
+    } catch (error) {
+        console.log(error);
+        return next(new CustomError(error));
+    }
+};
+
 module.exports = {
     createClass,
     updateClass,
@@ -86,4 +127,5 @@ module.exports = {
     deleteClass,
     updateManyClass,
     getClassByStudentId,
+    getAssignmentStatis,
 };
