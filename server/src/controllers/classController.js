@@ -111,7 +111,6 @@ const getAssignmentStatis = async (req, res, next) => {
         res.status(200).send({
             status: 'ok',
             studentList,
-            checkClass,
         });
     } catch (error) {
         console.log(error);
