@@ -47,6 +47,7 @@ const updateManyClass = updateMany(classModel);
 const getOneClass = getOne(classModel, [
     { path: 'section.assignment' },
     { path: 'teacher' },
+    { path: 'member' },
 ]);
 const getAllClass = getAll(classModel);
 const deleteClass = deleteOne(classModel);
