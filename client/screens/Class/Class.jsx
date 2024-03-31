@@ -1,10 +1,10 @@
 import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { Feather } from '@expo/vector-icons';
+import { Feather, AntDesign } from '@expo/vector-icons';
 import { Picker } from '@react-native-picker/picker';
 import ClassSection from '../../components/Class/ClassSection';
 import { useDispatch, useSelector } from 'react-redux';
-import { getClassInfo } from '../../redux/class/classSlice';
+import { getClassInfo, getClassStatis } from '../../redux/class/classSlice';
 import EditSection from '../../components/Class/EditSection';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 import CreateSection from '../../components/Class/CreateSection';
@@ -32,6 +32,15 @@ const Class = ({ navigation, route }) => {
         } else return null;
     };
 
+    const getAllAssigments = () => {
+        if (classInfo) {
+            let assignmentList = []
+            classInfo.section.forEach((section) => {
+                assignmentList = [...assignmentList, ...section.assignment]
+            })
+            return assignmentList
+        } else return [];
+    }
     const handleCancel = () => {
         setEditing(false);
         setCreating(false)
@@ -45,8 +54,14 @@ const Class = ({ navigation, route }) => {
         setCreateEditLoading(false)
     }
 
+    const handleViewStatis = () => {
+        navigation.navigate("Statis",{assignmentList: getAllAssigments(), studentList:classInfo.member })
+
+    }
+
     useEffect(() => {
         dispatch(getClassInfo(route.params.classId));
+        dispatch(getClassStatis(route.params.classId));
     }, []);
 
     useEffect(() => {
@@ -58,12 +73,23 @@ const Class = ({ navigation, route }) => {
             <LoadingIndicator loading={createEditLoading} />
             <Pressable style={styles.header} onPress={() => navigation.goBack()}>
                 <Feather name='arrow-left' size={27} color='black' />
+      
                 <Text style={styles.headerText}>A2-301</Text>
+                
+            
+
             </Pressable>
             <View style={styles.body}>
                 <View style={styles.classDetailContainer}>
                     <Text style={styles.className}>{classInfo?.name}</Text>
-                    <Text style={styles.classTime}>7:00 AM - 9:15 AM</Text>
+                    <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+                        <Text style={styles.classTime}>7:00 AM - 9:15 AM</Text>
+                        <Pressable style={styles.viewStatis} onPress={handleViewStatis}>
+                            <Text style={styles.viewStatisText}>View Statis</Text>
+                            <AntDesign name="caretright" size={12} color="white" />
+                        </Pressable>
+                    </View>
+
                 </View>
                 <View style={styles.sectionDropdownContainer}>
                     <Text style={styles.sectionTitle}>{creating ? "Create New Section" : "Section"}</Text>
@@ -92,7 +118,7 @@ const Class = ({ navigation, route }) => {
                         :
                         editing ?
                             <EditSection sectionData={getSectionData()} cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} /> :
-                            <ClassSection sectionData={getSectionData()} classId={route.params.classId}/>
+                            <ClassSection sectionData={getSectionData()} classId={route.params.classId} />
                 }
                 {
                     userInfo.role === "teacher" &&
@@ -226,4 +252,13 @@ const styles = StyleSheet.create({
         fontSize: 15,
         fontWeight: 'bold',
     },
+    viewStatis: {
+        flexDirection: "row",
+        alignItems: "center"
+    },
+    viewStatisText: {
+        textDecorationLine: "underline",
+        color:"white",
+        fontWeight: 'bold',
+    }
 });

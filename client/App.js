@@ -15,6 +15,7 @@ import ChangePassword from './screens/User/ChangePassword';
 import CheckOut from './screens/CheckOut/CheckOut';
 import AssigmentSubmit from './screens/Class/AssigmentSubmit';
 import SubmittedWork from './screens/Class/SubmittedWork';
+import Statis from './screens/Class/Statis';
 
 const Stack = createStackNavigator();
 
@@ -82,18 +83,17 @@ export default function App() {
                         component={SubmittedWork}
                     />
                     <Stack.Screen
-                        options={{
-                            headerShown: true,
-                        }}
                         name='ChangePassword'
                         component={ChangePassword}
                     />
                     <Stack.Screen
-                        options={{
-                            headerShown: true,
-                        }}
                         name='Checkout'
                         component={CheckOut}
+                    />
+                     <Stack.Screen
+                        name='Statis'
+                        options={{headerTitle: "Assignment Statis"}}
+                        component={Statis}
                     />
                 </Stack.Navigator>
             </NavigationContainer>

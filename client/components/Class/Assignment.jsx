@@ -9,10 +9,15 @@ const Assignment = ({assignment}) => {
         closeTime,
         summary
     } = assignment
+
+    const isEnd = () => {
+       return new Date(closeTime) < new Date()
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.assignmentHeader}>
-                <MaterialIcons name="assignment" size={24} color="#64B5F6" />
+                <MaterialIcons name="assignment" size={24} color={isEnd ? "gray" : "#64B5F6"} />
                 <View style={styles.assignmentHeaderInfoContainer}>
                     <View>
                         <Text style={styles.assignmentName}>{name}</Text>
@@ -23,7 +28,7 @@ const Assignment = ({assignment}) => {
                     </View>
                     <View style={styles.assignmentTimeContainer}>
                         <Text style={styles.assignmentTimeTitle}>Due: </Text>
-                        <Text>{new Date(closeTime).toLocaleString()}</Text>
+                        <Text style={isEnd ? styles.lateStatus : {}}>{new Date(closeTime).toLocaleString()}</Text>
                     </View>
                 </View>
             </View>
@@ -69,5 +74,8 @@ const styles = StyleSheet.create({
     },
     assignmentDetailText: {
         fontSize: 15
+    },
+    lateStatus: {
+        color: "#d4380d"
     }
 })

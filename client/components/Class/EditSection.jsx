@@ -258,7 +258,7 @@ const EditSection = ({ sectionData, cancel, classId, startLoading, stopLoading }
                         <Text style={styles.secondButtonText}>CANCEL</Text>
                     </Pressable>
                     <Pressable style={[styles.button, styles.mainButton]} onPress={handleSubmit}>
-                        <Text style={styles.mainButtonText}>EDIT</Text>
+                        <Text style={styles.mainButtonText}>SAVE</Text>
                     </Pressable>
                 </View>
             </View>

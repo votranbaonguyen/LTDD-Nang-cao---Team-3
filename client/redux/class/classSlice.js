@@ -10,6 +10,7 @@ const initialState = {
     allClassList: [],
     uploadDocumentsList: [],
     newAssignmentList: [],
+    studentStatisList: []
 };
 
 export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classId) => {
@@ -131,6 +132,25 @@ export const createOneSection = createAsyncThunk(
     }
 );
 
+export const getClassStatis = createAsyncThunk(
+    'class/getClassStatis',
+    async (classId) => {
+        try {
+            const userInfo = await getUserInfo();
+            let res = await axios.get(classAPI.getClassStatis(classId), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
+    }
+);
+
 export const classSlice = createSlice({
     name: 'class',
     initialState,
@@ -181,6 +201,19 @@ export const classSlice = createSlice({
         });
 
         builder.addCase(getAllClassById.rejected, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(getClassStatis.pending, (state, action) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getClassStatis.fulfilled, (state, action) => {
+            state.loading = false;
+            state.studentStatisList = action.payload.studentList
+        });
+
+        builder.addCase(getClassStatis.rejected, (state, action) => {
             state.loading = false;
         });
     },

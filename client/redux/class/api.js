@@ -6,5 +6,6 @@ export const classAPI = {
     getAllStudentClassByDate: (date,studentId) => `${host}/class?dayOfWeek=${date}&member[$in]=${studentId}`,
     getAllByTeacherId: (teacherId) => `${host}/class?teacher=${teacherId}`,
     getAllByStudentId: (studentId) => `${host}/class/student/${studentId}`,
-    updateOneSection: (classId) => `${host}/class/${classId}`
+    updateOneSection: (classId) => `${host}/class/${classId}`,
+    getClassStatis: (classId) => `${host}/class/${classId}/statis`
 }
