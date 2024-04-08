@@ -1,6 +1,9 @@
 const axios = require('axios');
 const { noticeModel } = require('../models/noticeModel');
 const { User } = require('../models/userModel');
+const crud = require('./crudController');
+
+const getAllNotice = crud.getAll(noticeModel);
 
 const sendNotice = async (req, res, next) => {
     try {
@@ -42,4 +45,5 @@ const sendNotice = async (req, res, next) => {
 
 module.exports = {
     sendNotice,
+    getAllNotice,
 };
