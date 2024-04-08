@@ -42,7 +42,6 @@ const classSchema = new Schema({
             documentUrl: [
                 {
                     type: String,
-                    default: 'https://abc.com/image',
                 },
             ],
             assignment: [
