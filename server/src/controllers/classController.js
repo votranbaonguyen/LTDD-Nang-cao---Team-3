@@ -1,4 +1,5 @@
 const { classModel } = require('../models/classModel');
+const { commentModel } = require('../models/commentModel');
 const { ApiFeatures } = require('../utils/ApiFeature');
 const { CustomError } = require('../utils/CustomError');
 const { createOne, deleteOne, getAll, getOne, updateMany } = require('./crudController');
@@ -44,27 +45,57 @@ const updateClass = async (req, res, next) => {
     }
 };
 const updateManyClass = updateMany(classModel);
-const getOneClass = getOne(classModel, [
-    { path: 'section.assignment' },
-    { path: 'teacher' },
-    { path: 'member' },
-]);
+const getOneClass = async (req, res, next) => {
+    try {
+        let query = classModel
+            .findById(req.params.id)
+            .lean()
+            .populate([
+                { path: 'section.assignment' },
+                { path: 'teacher' },
+                { path: 'member' },
+            ]);
+        const doc = await query;
+        if (!doc) {
+            return next(new CustomError('No document with this Id', 404));
+        }
+
+        const comments = await commentModel.find({ class: doc._id }).lean();
+        doc.comments = comments;
+
+        res.status(200).send({
+            status: 'ok',
+            data: doc,
+        });
+    } catch (error) {
+        console.log(error);
+        return next(new CustomError(error));
+    }
+};
 const getAllClass = getAll(classModel);
 const deleteClass = deleteOne(classModel);
 
 const getClassByStudentId = async (req, res, next) => {
     try {
-        const modelQuery = classModel.find({ member: { $in: req.params.id } });
+        const modelQuery = classModel.find({ member: { $in: req.params.id } }).lean();
 
         const apiFeat = new ApiFeatures(modelQuery, req.query);
         apiFeat.filter().sorting().pagination();
 
         const docs = await apiFeat.myQuery;
 
+        const promises = docs.map(async (item) => {
+            const comments = await commentModel.find({ class: item._id }).lean();
+            item.comments = comments;
+            return item;
+        });
+
+        const result = await Promise.all(promises);
+
         res.status(200).send({
             status: 'ok',
             total: docs.length,
-            data: docs,
+            data: result,
         });
     } catch (error) {
         console.log(error);

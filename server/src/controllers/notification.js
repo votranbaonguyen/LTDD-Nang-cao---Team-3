@@ -14,20 +14,20 @@ const sendNotice = async (req, res, next) => {
         //     body: 'test body',
         // };
 
-        const promises = message.map(async (item) => {
-            const user = await User.findOne({ pushToken: item.to }).lean();
+        // const promises = message.map(async (item) => {
+        //     const user = await User.findOne({ pushToken: item.to }).lean();
 
-            if (user) {
-                const newNotice = new noticeModel({
-                    user: user._id,
-                    title: item.title,
-                    body: item.body,
-                });
-                const temp = await newNotice.save();
-                return temp;
-            }
-        });
-        await Promise.all(promises);
+        //     if (user) {
+        //         const newNotice = new noticeModel({
+        //             user: user._id,
+        //             title: item.title,
+        //             body: item.body,
+        //         });
+        //         const temp = await newNotice.save();
+        //         return temp;
+        //     }
+        // });
+        // await Promise.all(promises);
 
         const result = await axios({
             method: 'post',
@@ -43,7 +43,7 @@ const sendNotice = async (req, res, next) => {
             });
         }
         res.status(200).send({
-            status: 'ok',
+            status: 'ok but not send noti',
         });
     } catch (error) {
         console.log(error);
