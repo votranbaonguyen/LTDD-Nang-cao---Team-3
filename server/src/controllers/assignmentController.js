@@ -23,7 +23,7 @@ const createAssignment = async (req, res, next) => {
         const tokenList = [];
         const promises = classOfAssignment.member.map(async (mem) => {
             const newNotice = new noticeModel({
-                user: user._id,
+                user: mem._id,
                 title: 'New assignment from your class',
                 body: `Please go to class: ${classOfAssignment.name} to check`,
             });
