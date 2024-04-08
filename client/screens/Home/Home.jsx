@@ -13,6 +13,13 @@ import { updateUser } from '../../redux/user/userSlice';
 import { registerForPushNotificationsAsync, schedulePushNotification } from '../../util/notification/notification';
 
 const Home = () => {
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
     const navigate = useNavigation();
     const dispatch = useDispatch();
     const { userInfo, loading } = useSelector((store) => store.userSlice);
@@ -130,7 +137,6 @@ const Home = () => {
                 pushToken: token
             }}))
             );
-            schedulePushNotification()
         }
     }, [userInfo]);
 

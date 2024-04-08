@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { A } from '@expo/html-elements'
 import { MaterialCommunityIcons, Octicons } from '@expo/vector-icons'
 import { useDispatch, useSelector } from 'react-redux'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -20,13 +19,11 @@ const NotificationInfo = ({
             <Text style={{ color: '#d2d4d5' }}> {notiTime}</Text>
           </View>
           <View style={styles.infoContainer}>
-            <View style={styles.notiIcon}>
-              <MaterialCommunityIcons name="new-box" size={30} color="#074007" />
-            </View>
+          
             <View style={{ flex: 10 }}>
               <Text style={styles.infoHeader}>{title}</Text>
               <Text style={styles.subInfo}>
-                {info.text}
+                {info}
               </Text>
             </View>
           </View>
@@ -39,7 +36,7 @@ export default NotificationInfo
 
 const styles = StyleSheet.create({
     container: {
-      marginBottom: 30,
+      marginBottom: 20,
       paddingLeft: 15,
       paddingRight: 20
     },
