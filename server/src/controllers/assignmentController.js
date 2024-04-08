@@ -3,7 +3,7 @@ const { classModel } = require('../models/classModel');
 const { noticeModel } = require('../models/noticeModel');
 const { sendNotice } = require('../service/notification');
 const { CustomError } = require('../utils/CustomError');
-const { createOne, deleteOne, getAll, getOne } = require('./crudController');
+const { deleteOne, getAll, getOne } = require('./crudController');
 
 const createAssignment = async (req, res, next) => {
     try {
@@ -36,8 +36,8 @@ const createAssignment = async (req, res, next) => {
 
         const message = {
             to: tokenList,
-            title: 'New assignment from your class',
-            body: `Please go to class: ${classOfAssignment.name} to check`,
+            title: 'New assignment',
+            body: `You have new assginment in class: ${classOfAssignment.name}, please check your classs`,
         };
 
         const result = await sendNotice(message);

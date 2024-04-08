@@ -8,6 +8,7 @@ const {
     changePassword,
 } = require('../controllers/authController');
 const { authentication } = require('../middlewares/auth/authenticate');
+const { getStudentStatis, updateUser } = require('../controllers/userController');
 
 userRouter.route('/auth').get(authentication, (req, res) => {
     res.status(200).send({
@@ -15,6 +16,8 @@ userRouter.route('/auth').get(authentication, (req, res) => {
         message: 'This user is authenticated, token is not expired',
     });
 });
+userRouter.route('/:id').patch(updateUser);
+userRouter.route('/:id/statis').get(getStudentStatis);
 userRouter.route('/register').post(register);
 userRouter.route('/login').post(login);
 userRouter.route('/forgetpassword').post(forgetPassword);
