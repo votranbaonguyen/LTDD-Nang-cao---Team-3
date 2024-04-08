@@ -8,6 +8,11 @@ const getAllNotice = crud.getAll(noticeModel);
 const sendNotice = async (req, res, next) => {
     try {
         const message = req.body.message;
+        // const message = {
+        //     to: 'ExponentPushToken[nGNCRKBcEt5a4oDJqzb0Ka]',
+        //     title: 'Bao Nguyen',
+        //     body: 'test body',
+        // };
 
         const promises = message.map(async (item) => {
             const user = await User.findOne({ pushToken: item.to }).lean();
@@ -22,7 +27,7 @@ const sendNotice = async (req, res, next) => {
                 return temp;
             }
         });
-        const final = await Promise.all(promises);
+        await Promise.all(promises);
 
         const result = await axios({
             method: 'post',
@@ -32,10 +37,13 @@ const sendNotice = async (req, res, next) => {
             },
             data: message,
         });
+        if (result.status === 200) {
+            return res.status(200).send({
+                status: 'ok',
+            });
+        }
         res.status(200).send({
             status: 'ok',
-            notification: result,
-            data: final,
         });
     } catch (error) {
         console.log(error);

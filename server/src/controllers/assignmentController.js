@@ -1,5 +1,6 @@
 const { assignmentModel } = require('../models/assignmentModel');
 const { classModel } = require('../models/classModel');
+const { noticeModel } = require('../models/noticeModel');
 const { sendNotice } = require('../service/notification');
 const { CustomError } = require('../utils/CustomError');
 const { createOne, deleteOne, getAll, getOne } = require('./crudController');
@@ -19,22 +20,37 @@ const createAssignment = async (req, res, next) => {
         if (!classOfAssignment)
             return next(new CustomError('No class with this id', 404));
 
-        const messages = [];
-        classOfAssignment.member.forEach((mem) => {
-            const message = {
-                to: mem.pushToken,
+        const tokenList = [];
+        const promises = classOfAssignment.member.map(async (mem) => {
+            const newNotice = new noticeModel({
+                user: user._id,
                 title: 'New assignment from your class',
                 body: `Please go to class: ${classOfAssignment.name} to check`,
-            };
-            messages.push(message);
+            });
+            const temp = await newNotice.save();
+            if (mem.pushToken) tokenList.push(mem.pushToken);
+            return temp;
         });
 
-        const result = await sendNotice(messages);
+        await Promise.all(promises);
 
+        const message = {
+            to: tokenList,
+            title: 'New assignment from your class',
+            body: `Please go to class: ${classOfAssignment.name} to check`,
+        };
+
+        const result = await sendNotice(message);
+
+        if (result.status === 200) {
+            return res.status(201).send({
+                status: 'ok',
+                data: newDocument,
+            });
+        }
         res.status(201).send({
             status: 'ok',
             data: newDocument,
-            resultOfNotification: result,
         });
     } catch (error) {
         console.log(error);
