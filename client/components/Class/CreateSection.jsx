@@ -186,6 +186,7 @@ const CreateSection = ({ cancel, classId, startLoading, stopLoading }) => {
                 const assignment = updatedAssigmentList[i];
                 let createData = {
                     ...assignment,
+                    classId
                 };
                 delete createData.assignmentIndex;
                 const assignmentRes = await dispatch(createAssignment(createData));

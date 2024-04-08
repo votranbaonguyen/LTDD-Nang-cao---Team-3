@@ -1,13 +1,16 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import Section from './Section';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllClassById, getTodayClassList } from '../../redux/class/classSlice';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
+import * as Notifications from 'expo-notifications';
 
 import * as Location from 'expo-location';
+import { updateUser } from '../../redux/user/userSlice';
+import { registerForPushNotificationsAsync, schedulePushNotification } from '../../util/notification/notification';
 
 const Home = () => {
     const navigate = useNavigation();
@@ -93,10 +96,41 @@ const Home = () => {
         }
     };
 
+    const [expoPushToken, setExpoPushToken] = useState("");
+    const [notification, setNotification] = useState(false);
+    const notificationListener = useRef();
+    const responseListener = useRef();
+    useEffect(() => {
+       
+
+        notificationListener.current =
+            Notifications.addNotificationReceivedListener((notification) => {
+                setNotification(notification);
+            });
+
+        responseListener.current =
+            Notifications.addNotificationResponseReceivedListener((response) => {
+                console.log(response);
+            });
+
+        return () => {
+            Notifications.removeNotificationSubscription(
+                notificationListener.current
+            );
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
+    }, []);
+
     useEffect(() => {
         if (userInfo) {
             dispatch(getTodayClassList(userInfo));
             dispatch(getAllClassById(userInfo));
+            registerForPushNotificationsAsync().then((token) =>
+            dispatch(updateUser({userId:userInfo._id, data: {
+                pushToken: token
+            }}))
+            );
+            schedulePushNotification()
         }
     }, [userInfo]);
 

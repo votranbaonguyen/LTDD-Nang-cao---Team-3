@@ -189,6 +189,7 @@ const EditSection = ({ sectionData, cancel, classId, startLoading, stopLoading }
 
             for (let i = 0; i < updatedAssigmentList.length; i++) {
                 const assignment = updatedAssigmentList[i];
+                console.log(assignment)
                 if (assignment._id) {
                     let updateData = {
                         ...assignment
@@ -197,9 +198,11 @@ const EditSection = ({ sectionData, cancel, classId, startLoading, stopLoading }
                     await dispatch(updateOneAssignment({ assignmentId: assignment._id, data: updateData }))
                 } else {
                     let createData = {
-                        ...assignment
+                        ...assignment,
+                        classId
                     }
                     delete createData.assignmentIndex
+                 
                     const assignmentRes = await dispatch(createAssignment(createData))
                     newSectionData.assignment.push(assignmentRes.payload.data._id)
                 }
