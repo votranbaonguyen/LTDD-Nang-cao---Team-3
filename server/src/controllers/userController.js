@@ -15,14 +15,18 @@ const getStudentStatis = async (req, res, next) => {
                 className: item.name,
                 classId: item._id,
                 submitList: [],
+                notSubmitList: [],
             };
             item.section.forEach((section) => {
                 section.assignment.forEach((assign) => {
+                    let isSubmit = false;
                     assign.detail.forEach((submit) => {
                         if (submit.student._id.toString() === req.params.id) {
                             temp.submitList.push(submit);
+                            isSubmit = true;
                         }
                     });
+                    if (!isSubmit) temp.notSubmitList.push(assign);
                 });
             });
             statisList.push(temp);
