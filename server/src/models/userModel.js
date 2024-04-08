@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please fill your name'],
     },
+    pushToken: String,
     email: {
         type: String,
         required: [true, 'Please provide your email'],

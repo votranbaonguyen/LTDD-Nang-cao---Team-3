@@ -41,6 +41,11 @@ const assignmentSchema = new Schema({
             submitUrl: {
                 type: String,
             },
+            feedback: String,
+            grade: {
+                type: Number,
+                min: 0,
+            },
         },
     ],
 });

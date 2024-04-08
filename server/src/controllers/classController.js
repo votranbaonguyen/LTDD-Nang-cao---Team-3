@@ -88,8 +88,14 @@ const getAssignmentStatis = async (req, res, next) => {
                 totalAssignment++;
                 assign.detail.forEach((submit) => {
                     studentList.forEach((student) => {
-                        if (student._id.toString() === submit.student._id.toString())
-                            student.assignment = [...student.assignment, submit];
+                        if (student._id.toString() === submit.student._id.toString()) {
+                            const submitOfStudent = {
+                                ...submit,
+                                assigmentName: assign.name,
+                                assignmentId: assign._id,
+                            };
+                            student.assignment = [...student.assignment, submitOfStudent];
+                        }
                     });
                 });
             });

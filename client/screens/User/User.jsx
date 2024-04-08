@@ -4,6 +4,8 @@ import { FontAwesome, MaterialIcons } from '@expo/vector-icons';
 import { deleteUserInfo } from '../../util/storage/userStorage';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector } from 'react-redux';
+//
+import * as Notifications from 'expo-notifications';
 
 function MenuItem({ name, icon, color, onClick }) {
     return (

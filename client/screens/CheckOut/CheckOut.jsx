@@ -241,7 +241,7 @@ export default function CheckOut() {
     useEffect(
         function () {
             if (!loadingCheckout && user?.role === 'student') {
-                const temp = checkoutInfo.checkoutList.find((x) => x.student._id === user._id);
+                const temp = checkoutInfo.checkoutList?.find((x) => x.student._id === user._id);
                 if (temp.status !== 'non-check') setIsCheck(true);
             }
         },

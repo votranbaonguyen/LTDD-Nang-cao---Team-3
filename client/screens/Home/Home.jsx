@@ -1,4 +1,4 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import Section from './Section';
 import { useNavigation } from '@react-navigation/native';
@@ -154,7 +154,12 @@ const Home = () => {
                         </Text>
                     </Pressable>
                 </View>
-                {renderClassList()}
+                <ScrollView
+                    style={{ flex: 1, marginBottom: 130 }}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {renderClassList()}
+                </ScrollView>
             </View>
             <View style={styles.buttonContainer}>
                 {/* <Pressable
@@ -212,6 +217,7 @@ const styles = StyleSheet.create({
         height: '100%',
         borderTopLeftRadius: 35,
         borderTopRightRadius: 35,
+        flex: 1,
     },
     buttonContainer: {
         position: 'absolute',
