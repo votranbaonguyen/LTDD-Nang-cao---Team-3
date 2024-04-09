@@ -1,5 +1,5 @@
 import { KeyboardAvoidingView, Platform, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, ToastAndroid, View } from 'react-native'
-import React,{useEffect} from 'react'
+import React, { useEffect } from 'react'
 import { Feather } from '@expo/vector-icons';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator'
 import CommentInfo from '../../components/Class/CommentInfo';
@@ -8,35 +8,48 @@ import { getAllClassComment } from '../../redux/class/classSlice';
 
 const AllComment = ({ navigation, route }) => {
     const dispatch = useDispatch()
-    const {classCommentList} = useSelector(store => store.classSlice)
+    const { classCommentList } = useSelector(store => store.classSlice)
+    const { userInfo } = useSelector((store) => store.userSlice);
     console.log(classCommentList)
     const renderComment = () => {
-        return classCommentList.map((comment,index) => {
-            return <CommentInfo comment={comment} key={index}/>
+        return classCommentList.map((comment, index) => {
+            return <CommentInfo comment={comment} key={index} />
         })
     }
 
     useEffect(() => {
         dispatch(getAllClassComment(route.params.classId))
-    },[route.params.classId])
-  return (
-    <View style={styles.container}>
-    {/* <LoadingIndicator loading={loading} /> */}
-    <Pressable style={styles.header} onPress={() => navigation.goBack()}>
-        <Feather name='arrow-left' size={27} color='black' />
-        <Text style={styles.headerText}>My Comment</Text>
-    </Pressable>
-    <ScrollView style={styles.body}>
-        
-        {renderComment()}
-    </ScrollView>
-        <Pressable style={[styles.button, styles.mainButton]} onPress={() => navigation.navigate("StudentComment", {classId: route.params.classId})}>
-            <Text style={styles.mainButtonText}>ADD COMMENT</Text>
-        </Pressable>
+    }, [route.params.classId])
+    return (
+        <View style={styles.container}>
+            {/* <LoadingIndicator loading={loading} /> */}
+            <Pressable style={styles.header} onPress={() => navigation.goBack()}>
+                <Feather name='arrow-left' size={27} color='black' />
+                {
+                userInfo.role === 'teacher' ?
+                <Text style={styles.headerText}>Student's Comments</Text>
+                :
+                <Text style={styles.headerText}>My Comments</Text>
+            }
+                
+            </Pressable>
+            <ScrollView style={styles.body}>
+
+                {renderComment()}
+            </ScrollView>
+            {
+                userInfo.role === 'student' ?
+                    <Pressable style={[styles.button, styles.mainButton]} onPress={() => navigation.navigate("StudentComment", { classId: route.params.classId })}>
+                        <Text style={styles.mainButtonText}>ADD COMMENT</Text>
+                    </Pressable>
+                    :
+                    <></>
+            }
 
 
-</View>
-  )
+
+        </View>
+    )
 }
 
 export default AllComment
@@ -69,7 +82,7 @@ const styles = StyleSheet.create({
     },
     body: {
         flex: 1,
-        marginBottom:100,
+        marginBottom: 100,
         marginTop: 20
     },
     uploadButton: {
