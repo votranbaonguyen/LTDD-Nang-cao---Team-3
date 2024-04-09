@@ -16,9 +16,6 @@ const createComment = async (req, res, next) => {
             .lean();
 
         let tokenList = [];
-        classOfComment.member.forEach((mem) => {
-            if (mem.pushToken) tokenList.push(mem.pushToken);
-        });
         tokenList.push(classOfComment.teacher._id);
         const message = {
             to: tokenList,
@@ -26,19 +23,6 @@ const createComment = async (req, res, next) => {
             body: `Class: ${classOfComment.name} has new comment, please check your classs`,
         };
         const result = await sendNotice(message);
-
-        //send notice to all student in class
-        const promises = classOfComment.member.map(async (mem) => {
-            const newNotice = new noticeModel({
-                user: mem._id,
-                title: 'New comment',
-                body: `Class: ${classOfComment.name} has new comment, please check your classs`,
-            });
-            const temp = await newNotice.save();
-            if (mem.pushToken) tokenList.push(mem.pushToken);
-            return temp;
-        });
-        await Promise.all(promises);
 
         // send notice to teacher
         const newNotice = new noticeModel({

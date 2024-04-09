@@ -18,6 +18,10 @@ const commentSchema = new Schema(
     { timestamps: true }
 );
 
+commentSchema.pre(/^find/, function () {
+    this.populate({ path: 'user', select: '_id name email' });
+});
+
 const commentModel = model('Comment', commentSchema);
 module.exports = {
     commentModel,
