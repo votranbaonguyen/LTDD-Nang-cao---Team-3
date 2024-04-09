@@ -19,6 +19,8 @@ const SubmittedWork = ({ navigation, route }) => {
     const [submittedText, setSubmittedText] = useState('')
     const { userInfo } = useSelector((store) => store.userSlice);
     const [loading, setLoading] = useState(false)
+    const [grade, setGrade] = useState('')
+    const [comment, setComment] = useState('')
 
     const handleUploadFile = async () => {
         try {
@@ -43,7 +45,7 @@ const SubmittedWork = ({ navigation, route }) => {
     const handleSubmit = async () => {
         setLoading(true)
         if (assignmentData !== null) {
-            if (!assignmentData.submitUrl && !assignmentData.submitText) {
+            if (!submittedFile || !submittedText) {
                 ToastAndroid.show('Please add a File or Text to submit', ToastAndroid.LONG);
             } else {
                 let submitAssignmentData = {
@@ -104,10 +106,34 @@ const SubmittedWork = ({ navigation, route }) => {
         }
         setLoading(false)
     }
-
+    const handleTeacherGrade = async () => {
+        setLoading(true)
+        let submitAssignmentData = {
+            feedback:comment,
+            grade: parseFloat(grade),
+            student: assignmentData.student._id,
+            _id: assignmentData._id,
+            submitTime: assignmentData.submitTime
+        }
+        if(assignmentData.submitText){
+            submitAssignmentData['submitText'] = assignmentData.submitText
+        }
+        if(assignmentData.submitUrl) submitAssignmentData['submitUrl'] = assignmentData.submitUrl
+        submitAssignmentData = {
+            detail: [
+                submitAssignmentData
+            ]
+        }
+        const a = await dispatch(studentSubmitAssignment({ assignmentId: mainAssignmentId, submitAssignmentData }))
+        ToastAndroid.show('Save Success!!', ToastAndroid.LONG);
+        setLoading(false)
+    }
     useEffect(() => {
         if (assignmentData) {
             if (assignmentData.submitText) setSubmittedText(assignmentData.submitText)
+            if (assignmentData.grade) setGrade(assignmentData.grade.toString())
+            if (assignmentData.feedback) setComment(assignmentData.feedback)
+            console.log(typeof assignmentData.grade)
         }
     }, [route.params.assignmentData])
 
@@ -124,13 +150,15 @@ const SubmittedWork = ({ navigation, route }) => {
                         Sumitted File
                     </Text>
                     {generateSubmittedFile()}
-                    {!view ??
+                    {view === false ?
                         <Pressable style={styles.uploadButton} onPress={handleUploadFile}>
                             <FontAwesome5 name="upload" size={20} color="#ccc" />
                             <Text style={styles.uploadButtonText}>
                                 Upload new Document
                             </Text>
                         </Pressable>
+                        :
+                        <></>
                     }
 
                 </View>
@@ -141,9 +169,9 @@ const SubmittedWork = ({ navigation, route }) => {
                     </Text>
                     <TextInput
                         value={submittedText}
-
+                        editable={!view}
                         multiline={true}
-                        numberOfLines={20}
+                        numberOfLines={10}
                         textAlignVertical='top'
                         style={[styles.input, { flex: 1 }]}
                         placeholder='Enter here...'
@@ -153,11 +181,57 @@ const SubmittedWork = ({ navigation, route }) => {
                         }}
                     />
                 </View>
+                {assignmentData !== null ?
+                <>
+                 <View style={[styles.submitFieldContainer, { flex: 1 }]}>
+                    <Text style={styles.submitFieldTitle}>
+                        Grade
+                    </Text>
+                    <TextInput
+                        editable={view}
+
+                        style={[styles.input, { flex: 1 }]}
+                        placeholder='Enter a grade'
+                        onChangeText={text => {
+                            setGrade(text)
+
+                        }}
+                        value={grade}
+                        keyboardType='numeric'
+                    />
+                </View>
+                <View style={[styles.submitFieldContainer, { flex: 1 }]}>
+                    <Text style={styles.submitFieldTitle}>
+                        Comment
+                    </Text>
+                    <TextInput
+                        value={comment}
+                        editable={view}
+                        multiline={true}
+                        numberOfLines={10}
+                        textAlignVertical='top'
+                        style={[styles.input, { flex: 1 }]}
+                        placeholder='Enter here...'
+                        onChangeText={text => {
+                            setComment(text)
+
+                        }}
+                    />
+                </View>
+                </>
+                :
+                <></>
+                }
+               
 
             </ScrollView>
-            {!view &&
+            {view === false ?
                 <Pressable style={[styles.button, styles.mainButton]} onPress={handleSubmit}>
                     <Text style={styles.mainButtonText}>SUBMIT</Text>
+                </Pressable>
+                :
+                <Pressable style={[styles.button, styles.mainButton]} onPress={handleTeacherGrade}>
+                    <Text style={styles.mainButtonText}>SAVE</Text>
                 </Pressable>
             }
 
@@ -194,7 +268,8 @@ const styles = StyleSheet.create({
         color: "#0A426E"
     },
     body: {
-        flex: 1
+        flex: 1,
+        marginBottom:100
     },
     uploadButton: {
         borderWidth: 2,

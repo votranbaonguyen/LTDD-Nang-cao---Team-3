@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
 
-const Assignment = ({assignment}) => {
+const Assignment = ({assignment,isSubmitted}) => {
     const {
         name,
         openTime,
@@ -17,7 +17,19 @@ const Assignment = ({assignment}) => {
     return (
         <View style={styles.container}>
             <View style={styles.assignmentHeader}>
+                <View>
                 <MaterialIcons name="assignment" size={24} color={isEnd ? "gray" : "#64B5F6"} />
+                {isSubmitted === true ?
+                <Entypo
+                name={'check'}
+                size={20}
+                color={'green'}
+            />
+            :<></>
+                }
+                
+                </View>
+                
                 <View style={styles.assignmentHeaderInfoContainer}>
                     <View>
                         <Text style={styles.assignmentName}>{name}</Text>

@@ -3,7 +3,7 @@ import React from 'react'
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-const StudentSubmittedAssignment = ({assignmentData}) => {
+const StudentSubmittedAssignment = ({assignmentData, mainAssignmentId}) => {
     const navigate = useNavigation()
     const generateStatusText = () => {
         if(assignmentData !== null){
@@ -24,7 +24,7 @@ const StudentSubmittedAssignment = ({assignmentData}) => {
         }else return <Text>None</Text>
     }
     return (
-        <Pressable style={styles.studentSubmittedAssignment} onPress={() => navigate.navigate("SubmittedWork", {assignmentData, view:true})}>
+        <Pressable style={styles.studentSubmittedAssignment} onPress={() => navigate.navigate("SubmittedWork", {assignmentData, view:true, mainAssignmentId})}>
             <View style={styles.avatarContainer}>
                 <FontAwesome name='user' size={30} color='white' />
             </View>

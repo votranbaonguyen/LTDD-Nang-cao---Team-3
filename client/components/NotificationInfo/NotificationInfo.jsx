@@ -19,7 +19,9 @@ const NotificationInfo = ({
             <Text style={{ color: '#d2d4d5' }}> {notiTime}</Text>
           </View>
           <View style={styles.infoContainer}>
-          
+          <View style={styles.notiIcon}>
+            <MaterialCommunityIcons name="new-box" size={30} color="#074007" />
+          </View>
             <View style={{ flex: 10 }}>
               <Text style={styles.infoHeader}>{title}</Text>
               <Text style={styles.subInfo}>

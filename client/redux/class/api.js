@@ -7,5 +7,12 @@ export const classAPI = {
     getAllByTeacherId: (teacherId) => `${host}/class?teacher=${teacherId}`,
     getAllByStudentId: (studentId) => `${host}/class/student/${studentId}`,
     updateOneSection: (classId) => `${host}/class/${classId}`,
-    getClassStatis: (classId) => `${host}/class/${classId}/statis`
+    getClassStatis: (classId) => `${host}/class/${classId}/statis`,
+    getStudentStatis: (studentId) => `${host}/user/${studentId}/statis`
+}
+
+export const commentAPI = {
+    getAllByStudent: (classId,userId) => `${host}/comment?class=${classId}&user=${userId}`,
+    getAllByClass: (classId) => `${host}/comment?class=${classId}`,
+    sendComment: `${host}/comment`
 }

@@ -5,6 +5,8 @@ import { FontAwesome, Entypo,Ionicons  } from '@expo/vector-icons';
 import User from '../User/User';
 import WeekCalendar from '../WeekCalendar/WeekCalendar';
 import AllNotification from '../AllNotification/AllNotification';
+import { getUserInfo } from '../../util/storage/userStorage';
+import {useState,useEffect} from 'react'
 
 const Tab = createBottomTabNavigator();
 

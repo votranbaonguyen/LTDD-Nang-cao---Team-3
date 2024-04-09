@@ -4,12 +4,13 @@ import { useNavigation } from '@react-navigation/native'
 import { FontAwesome,FontAwesome5 } from '@expo/vector-icons';
 import StudentSubmittedAssignment from './StudentSubmittedAssignment';
 
-const TeacherViewSubmitted = ({submittedList}) => {
+const TeacherViewSubmitted = ({submittedList,mainAssignmentId}) => {
+    console.log(mainAssignmentId)
     const navigate = useNavigation()
     const renderSubmittedAssignment = () => {
         if(submittedList.length > 0){
             return submittedList.map((assignment) => {
-                return <StudentSubmittedAssignment assignmentData={assignment} key={assignment._id}/>
+                return <StudentSubmittedAssignment assignmentData={assignment} key={assignment._id} mainAssignmentId={mainAssignmentId}/>
             })
         }else return <View>
             <Text style={styles.notSubmittedText}>

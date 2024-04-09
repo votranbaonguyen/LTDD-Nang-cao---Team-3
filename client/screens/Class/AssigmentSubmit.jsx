@@ -44,7 +44,7 @@ const AssigmentSubmit = ({ navigation, route }) => {
                 </View>
                 {
                     userInfo.role === "teacher" ?
-                        <TeacherViewSubmitted submittedList={detail} /> :
+                        <TeacherViewSubmitted submittedList={detail} mainAssignmentId={_id}/> :
                         <StudentSubmitField assignmentData={findStudentAssignmentData()} mainAssignmentId={_id} classId={route.params.classId}/>
                 }
 

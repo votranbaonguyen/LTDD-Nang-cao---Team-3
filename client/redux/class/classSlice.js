@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { authenticationAPI, classAPI } from './api';
+import { authenticationAPI, classAPI, commentAPI } from './api';
 import axios from 'axios';
 import { getUserInfo } from '../../util/storage/userStorage';
 
@@ -10,7 +10,9 @@ const initialState = {
     allClassList: [],
     uploadDocumentsList: [],
     newAssignmentList: [],
-    studentStatisList: []
+    studentStatisList: [],
+    classCommentList: [],
+    assignmentStatis: []
 };
 
 export const getClassInfo = createAsyncThunk('class/getClassInfo', async (classId) => {
@@ -151,6 +153,72 @@ export const getClassStatis = createAsyncThunk(
     }
 );
 
+export const getAllClassComment = createAsyncThunk(
+    'class/getAllClassComment',
+    async (classId) => {
+        try {
+            const userInfo = await getUserInfo();
+            let tempApi = ''
+            if(userInfo.role === 'teacher'){
+                tempApi = commentAPI.getAllByClass(classId)
+            } else tempApi = commentAPI.getAllByStudent(classId, userInfo._id)
+            let res = await axios.get(tempApi, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
+    }
+);
+
+export const sendStudentComment = createAsyncThunk(
+    'class/sendStudentComment',
+    async (data) => {
+        try {
+            const userInfo = await getUserInfo();
+            let newData = {
+                ...data,
+                user:userInfo._id,
+            }
+            let res = await axios.post(commentAPI.sendComment, newData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
+    }
+);
+
+export const getAllStudentClassAssignment = createAsyncThunk(
+    'class/getAllStudentClassAssignment',
+    async () => {
+        try {
+            const userInfo = await getUserInfo();
+
+            let res = await axios.get(classAPI.getStudentStatis(userInfo._id), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${userInfo.token}`,
+                },
+            });
+            return res.data;
+        } catch (error) {
+            console.log(error);
+            return error.response.data;
+        }
+    }
+);
+
 export const classSlice = createSlice({
     name: 'class',
     initialState,
@@ -214,6 +282,44 @@ export const classSlice = createSlice({
         });
 
         builder.addCase(getClassStatis.rejected, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(getAllClassComment.pending, (state, action) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getAllClassComment.fulfilled, (state, action) => {
+            state.loading = false;
+            state.classCommentList = action.payload.data
+        });
+
+        builder.addCase(getAllClassComment.rejected, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(sendStudentComment.pending, (state, action) => {
+            state.loading = true;
+        });
+
+        builder.addCase(sendStudentComment.fulfilled, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(sendStudentComment.rejected, (state, action) => {
+            state.loading = false;
+        });
+
+        builder.addCase(getAllStudentClassAssignment.pending, (state, action) => {
+            state.loading = true;
+        });
+
+        builder.addCase(getAllStudentClassAssignment.fulfilled, (state, action) => {
+            state.loading = false;
+            state.assignmentStatis = action.payload.data
+        });
+
+        builder.addCase(getAllStudentClassAssignment.rejected, (state, action) => {
             state.loading = false;
         });
     },

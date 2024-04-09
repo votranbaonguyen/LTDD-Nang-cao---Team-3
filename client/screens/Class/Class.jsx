@@ -55,7 +55,7 @@ const Class = ({ navigation, route }) => {
     }
 
     const handleViewStatis = () => {
-        navigation.navigate("Statis",{assignmentList: getAllAssigments(), studentList:classInfo.member })
+        navigation.navigate("Statis", { assignmentList: getAllAssigments(), studentList: classInfo.member })
 
     }
 
@@ -67,22 +67,23 @@ const Class = ({ navigation, route }) => {
     useEffect(() => {
         setSelectedSection(classInfo?.section[0]._id);
     }, []);
+    console.log(userInfo)
     return (
         <SafeAreaView style={styles.container}>
             <LoadingIndicator loading={loading} />
             <LoadingIndicator loading={createEditLoading} />
             <Pressable style={styles.header} onPress={() => navigation.goBack()}>
                 <Feather name='arrow-left' size={27} color='black' />
-      
+
                 <Text style={styles.headerText}>A2-301</Text>
-                
-            
+
+
 
             </Pressable>
             <View style={styles.body}>
                 <View style={styles.classDetailContainer}>
                     <Text style={styles.className}>{classInfo?.name}</Text>
-                    <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <Text style={styles.classTime}>7:00 AM - 9:15 AM</Text>
                         <Pressable style={styles.viewStatis} onPress={handleViewStatis}>
                             <Text style={styles.viewStatisText}>View Statis</Text>
@@ -121,27 +122,31 @@ const Class = ({ navigation, route }) => {
                             <ClassSection sectionData={getSectionData()} classId={route.params.classId} />
                 }
                 {
-                    userInfo.role === "teacher" &&
-                    (
-                        <View style={styles.buttonContainer}>
-                            {
-                                editing || creating ?
-                                    <>
+                    userInfo.role === "teacher" ?
+                        (
+                            <View style={styles.buttonContainer}>
+                                {
+                                    editing || creating ?
+                                        <>
 
-                                    </>
-                                    :
-                                    <View style={styles.buttonContainer}>
-                                        <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
-                                            <Text style={styles.secondButtonText}>CREATE</Text>
-                                        </Pressable>
-                                        <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
-                                            <Text style={styles.mainButtonText}>EDIT</Text>
-                                        </Pressable>
-                                    </View>
-                            }
+                                        </>
+                                        :
+                                        <View style={styles.buttonContainer}>
+                                            <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
+                                                <Text style={styles.secondButtonText}>CREATE</Text>
+                                            </Pressable>
+                                            <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
+                                                <Text style={styles.mainButtonText}>EDIT</Text>
+                                            </Pressable>
+                                        </View>
+                                }
 
-                        </View>
-                    )
+                            </View>
+                        )
+                        :
+                        (
+                            <></>
+                        )
                 }
 
 
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 15,
         backgroundColor: '#EEF2F8',
-        position: 'relative',
+        position: 'relative'
     },
     classDetailContainer: {
         backgroundColor: '#0A426E',
@@ -258,7 +263,7 @@ const styles = StyleSheet.create({
     },
     viewStatisText: {
         textDecorationLine: "underline",
-        color:"white",
+        color: "white",
         fontWeight: 'bold',
     }
 });
