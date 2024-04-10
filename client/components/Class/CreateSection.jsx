@@ -186,7 +186,7 @@ const CreateSection = ({ cancel, classId, startLoading, stopLoading }) => {
                 const assignment = updatedAssigmentList[i];
                 let createData = {
                     ...assignment,
-                    classId
+                    classId,
                 };
                 delete createData.assignmentIndex;
                 const assignmentRes = await dispatch(createAssignment(createData));
@@ -194,7 +194,7 @@ const CreateSection = ({ cancel, classId, startLoading, stopLoading }) => {
             }
 
             await dispatch(
-                createOneSectionz({
+                createOneSection({
                     classId: classId,
                     data: {
                         section: [newSectionData],

@@ -54,8 +54,21 @@ export default function CheckOutStatistic({ checkoutInfo }) {
                             }}
                         >
                             <Text style={{ fontWeight: '600' }}>{ele.student.name}</Text>
-                            <Text>{ele?.time ? ele.time : '----'}</Text>
-                            {/* <Text>{ele.status}</Text> */}
+                            <View style={{ display: 'flex', flexDirection: 'row' }}>
+                                <Text>{ele?.time ? `${ele.time} | ` : '---- | '}</Text>
+                                <Text
+                                    style={{
+                                        color:
+                                            ele?.status === 'on-time'
+                                                ? 'green'
+                                                : ele?.status === 'non-check'
+                                                ? 'blue'
+                                                : 'red',
+                                    }}
+                                >
+                                    {ele.status}
+                                </Text>
+                            </View>
                         </View>
                     );
                 })}

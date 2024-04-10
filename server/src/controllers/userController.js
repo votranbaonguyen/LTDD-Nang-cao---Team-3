@@ -1,4 +1,3 @@
-const { assignmentModel } = require('../models/assignmentModel');
 const { classModel } = require('../models/classModel');
 const { User } = require('../models/userModel');
 const { CustomError } = require('../utils/CustomError');

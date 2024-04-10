@@ -45,6 +45,7 @@ export default function ChangePassword() {
                 ToastAndroid.LONG
             );
         } else {
+            console.log(res.payload.message);
             ToastAndroid.show(res.payload.message, ToastAndroid.LONG);
         }
     };
@@ -53,18 +54,21 @@ export default function ChangePassword() {
             <LoadingIndicator loading={loading} />
             <Text>Enter your old and a new one to change your password</Text>
             <TextInput
+                secureTextEntry={true}
                 placeholder='Enter your old password'
                 style={styles.input}
                 value={oldPassword}
                 onChangeText={(text) => setOldPassword(text)}
             />
             <TextInput
+                secureTextEntry={true}
                 placeholder='Enter your new Password'
                 style={styles.input}
                 value={newPassword}
                 onChangeText={(text) => setNewPassword(text)}
             />
             <TextInput
+                secureTextEntry={true}
                 placeholder='Confirm your new Password'
                 style={styles.input}
                 value={repeatPass}

@@ -16,7 +16,7 @@ const Class = ({ navigation, route }) => {
     const [editing, setEditing] = useState(false);
     const [creating, setCreating] = useState(false);
     const { classInfo, loading } = useSelector((store) => store.classSlice);
-    const [createEditLoading, setCreateEditLoading] = useState(false)
+    const [createEditLoading, setCreateEditLoading] = useState(false);
     const { userInfo } = useSelector((store) => store.userSlice);
     const generateSectionDropdown = () => {
         if (classInfo)
@@ -34,30 +34,32 @@ const Class = ({ navigation, route }) => {
 
     const getAllAssigments = () => {
         if (classInfo) {
-            let assignmentList = []
+            let assignmentList = [];
             classInfo.section.forEach((section) => {
-                assignmentList = [...assignmentList, ...section.assignment]
-            })
-            return assignmentList
+                assignmentList = [...assignmentList, ...section.assignment];
+            });
+            return assignmentList;
         } else return [];
-    }
+    };
     const handleCancel = () => {
         setEditing(false);
-        setCreating(false)
+        setCreating(false);
         dispatch(getClassInfo(route.params.classId));
-    }
+    };
 
     const startLoading = () => {
-        setCreateEditLoading(true)
-    }
+        setCreateEditLoading(true);
+    };
     const stopLoading = () => {
-        setCreateEditLoading(false)
-    }
+        setCreateEditLoading(false);
+    };
 
     const handleViewStatis = () => {
-        navigation.navigate("Statis", { assignmentList: getAllAssigments(), studentList: classInfo.member })
-
-    }
+        navigation.navigate('Statis', {
+            assignmentList: getAllAssigments(),
+            studentList: classInfo.member,
+        });
+    };
 
     useEffect(() => {
         dispatch(getClassInfo(route.params.classId));
@@ -67,7 +69,6 @@ const Class = ({ navigation, route }) => {
     useEffect(() => {
         setSelectedSection(classInfo?.section[0]._id);
     }, []);
-    console.log(userInfo)
     return (
         <SafeAreaView style={styles.container}>
             <LoadingIndicator loading={loading} />
@@ -76,29 +77,26 @@ const Class = ({ navigation, route }) => {
                 <Feather name='arrow-left' size={27} color='black' />
 
                 <Text style={styles.headerText}>A2-301</Text>
-
-
-
             </Pressable>
             <View style={styles.body}>
                 <View style={styles.classDetailContainer}>
                     <Text style={styles.className}>{classInfo?.name}</Text>
-                    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                         <Text style={styles.classTime}>7:00 AM - 9:15 AM</Text>
                         <Pressable style={styles.viewStatis} onPress={handleViewStatis}>
                             <Text style={styles.viewStatisText}>View Statis</Text>
-                            <AntDesign name="caretright" size={12} color="white" />
+                            <AntDesign name='caretright' size={12} color='white' />
                         </Pressable>
                     </View>
-
                 </View>
                 <View style={styles.sectionDropdownContainer}>
-                    <Text style={styles.sectionTitle}>{creating ? "Create New Section" : "Section"}</Text>
-                    {creating ?
+                    <Text style={styles.sectionTitle}>
+                        {creating ? 'Create New Section' : 'Section'}
+                    </Text>
+                    {creating ? (
                         <></>
-                        :
+                    ) : (
                         <View style={styles.picker}>
-
                             <Picker
                                 selectedValue={selectedSection}
                                 onValueChange={(itemValue, itemIndex) => {
@@ -108,50 +106,52 @@ const Class = ({ navigation, route }) => {
                             >
                                 {generateSectionDropdown()}
                             </Picker>
-
-
                         </View>
-                    }
+                    )}
                 </View>
-                {
-                    creating ?
-                        <CreateSection cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} />
-                        :
-                        editing ?
-                            <EditSection sectionData={getSectionData()} cancel={handleCancel} classId={route.params.classId} startLoading={startLoading} stopLoading={stopLoading} /> :
-                            <ClassSection sectionData={getSectionData()} classId={route.params.classId} />
-                }
-                {
-                    userInfo.role === "teacher" ?
-                        (
-                            <View style={styles.buttonContainer}>
-                                {
-                                    editing || creating ?
-                                        <>
-
-                                        </>
-                                        :
-                                        <View style={styles.buttonContainer}>
-                                            <Pressable style={[styles.button, styles.secondButton]} onPress={() => setCreating(true)}>
-                                                <Text style={styles.secondButtonText}>CREATE</Text>
-                                            </Pressable>
-                                            <Pressable style={[styles.button, styles.mainButton]} onPress={() => setEditing(true)}>
-                                                <Text style={styles.mainButtonText}>EDIT</Text>
-                                            </Pressable>
-                                        </View>
-                                }
-
-                            </View>
-                        )
-                        :
-                        (
+                {creating ? (
+                    <CreateSection
+                        cancel={handleCancel}
+                        classId={route.params.classId}
+                        startLoading={startLoading}
+                        stopLoading={stopLoading}
+                    />
+                ) : editing ? (
+                    <EditSection
+                        sectionData={getSectionData()}
+                        cancel={handleCancel}
+                        classId={route.params.classId}
+                        startLoading={startLoading}
+                        stopLoading={stopLoading}
+                    />
+                ) : (
+                    <ClassSection sectionData={getSectionData()} classId={route.params.classId} />
+                )}
+                {userInfo.role === 'teacher' ? (
+                    <View style={styles.buttonContainer}>
+                        {editing || creating ? (
                             <></>
-                        )
-                }
-
-
+                        ) : (
+                            <View style={styles.buttonContainer}>
+                                <Pressable
+                                    style={[styles.button, styles.secondButton]}
+                                    onPress={() => setCreating(true)}
+                                >
+                                    <Text style={styles.secondButtonText}>CREATE</Text>
+                                </Pressable>
+                                <Pressable
+                                    style={[styles.button, styles.mainButton]}
+                                    onPress={() => setEditing(true)}
+                                >
+                                    <Text style={styles.mainButtonText}>EDIT</Text>
+                                </Pressable>
+                            </View>
+                        )}
+                    </View>
+                ) : (
+                    <></>
+                )}
             </View>
-
         </SafeAreaView>
     );
 };
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 15,
         backgroundColor: '#EEF2F8',
-        position: 'relative'
+        position: 'relative',
     },
     classDetailContainer: {
         backgroundColor: '#0A426E',
@@ -243,8 +243,8 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         paddingHorizontal: 20,
-        flexDirection: "row",
-        gap: 10
+        flexDirection: 'row',
+        gap: 10,
     },
     secondButton: {
         backgroundColor: 'white',
@@ -258,12 +258,12 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     viewStatis: {
-        flexDirection: "row",
-        alignItems: "center"
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     viewStatisText: {
-        textDecorationLine: "underline",
-        color: "white",
+        textDecorationLine: 'underline',
+        color: 'white',
         fontWeight: 'bold',
-    }
+    },
 });

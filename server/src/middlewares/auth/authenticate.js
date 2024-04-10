@@ -38,6 +38,7 @@ const authentication = async (req, res, next) => {
 
     // save user information to request
     req.user = testUser;
+    console.log(testUser);
     next();
 };
 

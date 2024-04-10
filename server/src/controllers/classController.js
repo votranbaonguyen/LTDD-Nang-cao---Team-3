@@ -1,3 +1,4 @@
+const { checkoutModel } = require('../models/checkoutModel');
 const { classModel } = require('../models/classModel');
 const { commentModel } = require('../models/commentModel');
 const { ApiFeatures } = require('../utils/ApiFeature');
@@ -72,7 +73,37 @@ const getOneClass = async (req, res, next) => {
         return next(new CustomError(error));
     }
 };
-const getAllClass = getAll(classModel);
+const getAllClass = async (req, res, next) => {
+    try {
+        const apiFeat = new ApiFeatures(classModel.find().lean(), req.query);
+        apiFeat.filter().sorting().pagination();
+
+        const docs = await apiFeat.myQuery;
+
+        const promises = docs.map(async (item) => {
+            let isCheckToday = false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const checkoutOfClass = await checkoutModel
+                .findOne({ day: { $gte: today }, class: item._id, status: 'finish' })
+                .lean();
+            if (checkoutOfClass) isCheckToday = true;
+            item.isCheckToday = isCheckToday;
+
+            return item;
+        });
+        await Promise.all(promises);
+
+        res.status(200).send({
+            status: 'ok',
+            total: docs.length,
+            data: docs,
+        });
+    } catch (error) {
+        console.log(error);
+        return next(new CustomError(error));
+    }
+};
 const deleteClass = deleteOne(classModel);
 
 const getClassByStudentId = async (req, res, next) => {
@@ -87,10 +118,21 @@ const getClassByStudentId = async (req, res, next) => {
         const promises = docs.map(async (item) => {
             const comments = await commentModel.find({ class: item._id }).lean();
             item.comments = comments;
+            //
+            let isCheckToday = false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const checkoutOfClass = await checkoutModel
+                .findOne({ day: { $gte: today }, class: item._id, status: 'finish' })
+                .lean();
+            if (checkoutOfClass) isCheckToday = true;
+            item.isCheckToday = isCheckToday;
+
             return item;
         });
-
         const result = await Promise.all(promises);
+
+        //
 
         res.status(200).send({
             status: 'ok',

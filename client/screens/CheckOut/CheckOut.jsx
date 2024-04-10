@@ -59,11 +59,7 @@ export default function CheckOut() {
                     <Text style={styles.mainButtonText}>START CHECKOUT</Text>
                 </Pressable>
             );
-        else if (
-            checkoutInfo?.status === 'processing' &&
-            user?.role === 'student' &&
-            isCheck === false
-        )
+        else if (checkoutInfo?.status != 'not-yet' && user?.role === 'student' && isCheck === false)
             return (
                 <Pressable
                     onPress={() => handleCheckout(user._id)}
@@ -73,11 +69,7 @@ export default function CheckOut() {
                     <Text style={styles.mainButtonText}>CHECKOUT NOW</Text>
                 </Pressable>
             );
-        else if (
-            checkoutInfo?.status === 'processing' &&
-            user?.role === 'student' &&
-            isCheck === true
-        )
+        else if (checkoutInfo?.status != 'not-yet' && user?.role === 'student' && isCheck === true)
             return (
                 <Pressable
                     onPress={() => handleCheckout(user._id)}
@@ -161,7 +153,7 @@ export default function CheckOut() {
             const time = `${new Date().getHours()}:${
                 minute < 10 ? '0' + minute.toString() : minute
             }`;
-            const isOntime = checkoutInfo.status === 'processing' ? 'on-time' : 'late';
+            const isOntime = checkoutInfo?.status === 'processing' ? 'on-time' : 'late';
             const myAddress = await getMyLocation();
             const { teacherAddress } = checkoutInfo;
             const isTooFar =
@@ -174,7 +166,7 @@ export default function CheckOut() {
             const checkItem = {
                 time: time,
                 student: studentId,
-                status: isTooFar ? 'too-far' : isOntime ? 'on-time' : 'late',
+                status: isTooFar ? 'too-far' : isOntime,
             };
             const newCheckList = checkoutInfo.checkoutList.map((ele) => {
                 if (studentId === ele.student._id.toString()) return checkItem;
@@ -242,7 +234,7 @@ export default function CheckOut() {
         function () {
             if (!loadingCheckout && user?.role === 'student') {
                 const temp = checkoutInfo.checkoutList?.find((x) => x.student._id === user._id);
-                if (temp.status !== 'non-check') setIsCheck(true);
+                if (temp?.status !== 'non-check') setIsCheck(true);
             }
         },
         [loadingCheckout, loadingUser]

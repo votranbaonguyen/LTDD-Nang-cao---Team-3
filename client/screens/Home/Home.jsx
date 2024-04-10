@@ -1,30 +1,39 @@
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import React, { useEffect, useState,useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Section from './Section';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllClassById, getAllStudentClassAssignment, getTodayClassList } from '../../redux/class/classSlice';
+import {
+    getAllClassById,
+    getAllStudentClassAssignment,
+    getTodayClassList,
+} from '../../redux/class/classSlice';
 import LoadingIndicator from '../../util/Loading/LoadingIndicator';
 import * as Notifications from 'expo-notifications';
 
 import * as Location from 'expo-location';
 import { updateUser } from '../../redux/user/userSlice';
-import { registerForPushNotificationsAsync, schedulePushNotification } from '../../util/notification/notification';
+import {
+    registerForPushNotificationsAsync,
+    schedulePushNotification,
+} from '../../util/notification/notification';
 import ClassAssignmentStatisDetail from '../../components/Class/ClassAssignmentStatisDetail';
 
 const Home = () => {
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
-          shouldShowAlert: true,
-          shouldPlaySound: false,
-          shouldSetBadge: false,
+            shouldShowAlert: true,
+            shouldPlaySound: false,
+            shouldSetBadge: false,
         }),
-      });
+    });
     const navigate = useNavigation();
     const dispatch = useDispatch();
     const { userInfo, loading } = useSelector((store) => store.userSlice);
-    const { todayClassList, allClassList, assignmentStatis } = useSelector((store) => store.classSlice);
+    const { todayClassList, allClassList, assignmentStatis } = useSelector(
+        (store) => store.classSlice
+    );
 
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState(null);
@@ -39,7 +48,7 @@ const Home = () => {
     const handleChangeTab = (type) => {
         if (type === 'one') dispatch(getTodayClassList(userInfo));
         else if (type === 'all') dispatch(getAllClassById(userInfo));
-        else dispatch(getAllStudentClassAssignment())
+        else dispatch(getAllStudentClassAssignment());
         setActiveNav(type);
     };
 
@@ -65,7 +74,7 @@ const Home = () => {
                         <Section
                             time={`${classDetail.startTime} - ${classDetail.endTime}`}
                             room={classDetail.room}
-                            isChecked={true}
+                            isChecked={classDetail.isCheckToday}
                             teacher={'Bảo Nguyên'}
                             name={classDetail.name}
                             key={classDetail._id}
@@ -87,7 +96,7 @@ const Home = () => {
                         <Section
                             time={`${classDetail.startTime} - ${classDetail.endTime}`}
                             room={classDetail.room}
-                            isChecked={true}
+                            isChecked={classDetail.isCheckToday}
                             teacher={classDetail.teacher}
                             name={classDetail.name}
                             key={classDetail._id}
@@ -103,42 +112,38 @@ const Home = () => {
                     </View>
                 );
         } else {
-            if(assignmentStatis.length > 0){
-                return assignmentStatis.map((classData,index) => {
-                    return <ClassAssignmentStatisDetail key={index} classData={classData}/>
-
-                        
-                    
-                })
-            }else return (
-                <View style={styles.noClassContainer}>
-                    <Text style={styles.noClassText}>You don't have any assignment</Text>
-                </View>
-            );
+            if (assignmentStatis.length > 0) {
+                return assignmentStatis.map((classData, index) => {
+                    return <ClassAssignmentStatisDetail key={index} classData={classData} />;
+                });
+            } else
+                return (
+                    <View style={styles.noClassContainer}>
+                        <Text style={styles.noClassText}>You don't have any assignment</Text>
+                    </View>
+                );
         }
     };
 
-    const [expoPushToken, setExpoPushToken] = useState("");
+    const [expoPushToken, setExpoPushToken] = useState('');
     const [notification, setNotification] = useState(false);
     const notificationListener = useRef();
     const responseListener = useRef();
     useEffect(() => {
-       
-
-        notificationListener.current =
-            Notifications.addNotificationReceivedListener((notification) => {
+        notificationListener.current = Notifications.addNotificationReceivedListener(
+            (notification) => {
                 setNotification(notification);
-            });
+            }
+        );
 
-        responseListener.current =
-            Notifications.addNotificationResponseReceivedListener((response) => {
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(
+            (response) => {
                 console.log(response);
-            });
+            }
+        );
 
         return () => {
-            Notifications.removeNotificationSubscription(
-                notificationListener.current
-            );
+            Notifications.removeNotificationSubscription(notificationListener.current);
             Notifications.removeNotificationSubscription(responseListener.current);
         };
     }, []);
@@ -148,9 +153,14 @@ const Home = () => {
             dispatch(getTodayClassList(userInfo));
             dispatch(getAllClassById(userInfo));
             registerForPushNotificationsAsync().then((token) =>
-            dispatch(updateUser({userId:userInfo._id, data: {
-                pushToken: token
-            }}))
+                dispatch(
+                    updateUser({
+                        userId: userInfo._id,
+                        data: {
+                            pushToken: token,
+                        },
+                    })
+                )
             );
         }
     }, [userInfo]);
@@ -207,29 +217,28 @@ const Home = () => {
                             All Class
                         </Text>
                     </Pressable>
-                    {userInfo.role === 'student' ? 
-                     <Pressable
-                        style={[
-                            styles.topNavButton,
-                            { borderLeftWidth: 0.5, borderLeftColor: '#ccc' },
-                            ,
-                            activeNav === 'assignment' ? styles.activeNavButton : {},
-                        ]}
-                        onPress={() => handleChangeTab('assignment')}
-                    >
-                        <Text
+                    {userInfo?.role === 'student' ? (
+                        <Pressable
                             style={[
-                                { fontSize: 17, fontWeight: 'bold' },
-                                activeNav === 'assignment' ? styles.activeNavButtonText : {},
+                                styles.topNavButton,
+                                { borderLeftWidth: 0.5, borderLeftColor: '#ccc' },
+                                ,
+                                activeNav === 'assignment' ? styles.activeNavButton : {},
                             ]}
+                            onPress={() => handleChangeTab('assignment')}
                         >
-                            Assignments
-                        </Text>
-                    </Pressable>
-                    : 
-                    <></>
-                }
-                   
+                            <Text
+                                style={[
+                                    { fontSize: 17, fontWeight: 'bold' },
+                                    activeNav === 'assignment' ? styles.activeNavButtonText : {},
+                                ]}
+                            >
+                                Assignments
+                            </Text>
+                        </Pressable>
+                    ) : (
+                        <></>
+                    )}
                 </View>
                 <ScrollView
                     style={{ flex: 1, marginBottom: 130 }}
