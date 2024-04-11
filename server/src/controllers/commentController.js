@@ -16,7 +16,7 @@ const createComment = async (req, res, next) => {
             .lean();
 
         let tokenList = [];
-        tokenList.push(classOfComment.teacher._id);
+        tokenList.push(classOfComment.teacher.pushToken);
         const message = {
             to: tokenList,
             title: 'New comment',
